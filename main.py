@@ -114,7 +114,7 @@ async def run_autocatcher(token):
         logger.info(f"+ Blacklisted Pokemons: {bot.blacklisted_pokemons}")
         logger.info("+ ====================================== +")
 
-        bot.load_extension("handler.command")
+        await bot.load_extension("handler.command")
         print("Loaded Commands")
         bot.started = time.time()  # Stats The Time
         bot.command_prefix = f"<@{bot.user.id}> "  # Set Command Prefix
@@ -351,7 +351,7 @@ async def run_autocatcher(token):
 
         if "the pokémon is" in message.content.lower() and bot.verified:
             logger.info("Solving The Hint")
-            solved_hint = solve(message.content).replace("['", "").replace("']", "")
+            solved_hint = "".join(solve(message.content)).replace("['", "").replace("']", "")
             await message.channel.send(f"<@716390085896962058> c {solved_hint}")
             logger.info("Hint Solved")
 
