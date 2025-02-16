@@ -351,8 +351,8 @@ async def run_autocatcher(token):
 
         if "the pokémon is" in message.content.lower() and bot.verified:
             logger.info("Solving The Hint")
-            hint = message.content.split("`")[1]
-            await message.channel.send(f"<@716390085896962058> c {hint}")
+            hint = solve(message.content)
+            await message.channel.send(f"<@716390085896962058> c {hint[0]}")
             logger.info("Hint Solved")
 
         # ========================================== CATCH LOG HANDLING ========================================== #
