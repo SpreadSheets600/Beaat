@@ -373,9 +373,9 @@ async def run_autocatcher(token):
                 embed2.set_author(name="Pokefier", url="https://github.com/sayaarcodes/pokefier", icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png")
                 embed2.set_thumbnail(url=pokemon["image"]["url"])
                 embed2.set_timestamp()
-                await send_log(embed=embed2, WEBHOOK_URL=WEBHOOK_URL)
+                send_log(embed=embed2, WEBHOOK_URL=WEBHOOK_URL)
 
-            await send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
+            send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
 
         # ========================================== CAPTCHA HANDLING ========================================== #
         if f"https://verify.poketwo.net/captcha/{bot.user.id}" in message.content and bot.verified:
