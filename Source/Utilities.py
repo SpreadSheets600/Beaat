@@ -3,7 +3,7 @@ import json
 import unicodedata
 from discord_webhook import DiscordWebhook
 
-with open("source/Pokemon", "r", encoding="utf8") as file:
+with open("Source/Pokemon", "r", encoding="utf8") as file:
     pokemon_list = file.read()
 
 
