@@ -1,8 +1,5 @@
-discord-py-self
-discord-webhook
+git+https://github.com/dolfies/discord.py-self@master#egg=discord.py-self[voice,speed]
+discord_webhook
 logging
 numpy
-python-dotenv
-ruff
-streamlit
 tensorflow
