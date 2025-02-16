@@ -34,7 +34,6 @@ logging.basicConfig(
 # Defining The Logger
 logger = logging.getLogger(__name__)
 
-
 # Defining The Log Message Function
 def log_message(level, message):
     if level == "info":
@@ -47,7 +46,6 @@ def log_message(level, message):
         logger.debug(message)
     else:
         logger.info(message)
-
 
 logger.info("Initialized Logging")
 
@@ -76,7 +74,6 @@ WHITELISTED_CHANNELS = config["WHITELISTED_CHANNELS"]
 
 # ========================================== SPAM ========================================== #
 
-
 def spam():
     with open("Messages/Messages.txt", "r", encoding="utf-8", errors="ignore") as file:
         messages = file.readlines()
@@ -85,9 +82,7 @@ def spam():
 
     return spam_message
 
-
 # ========================================== AUTOCATCHER CLASS ========================================== #
-
 
 class Autocatcher(commands.Bot):
     def __init__(self):
@@ -118,9 +113,7 @@ class Autocatcher(commands.Bot):
 
         return name.lower()
 
-
 # ========================================== MAIN FUNCTIONS ========================================== #
-
 
 async def run_autocatcher(token):
     bot = Autocatcher()  # Initialize Bot
@@ -158,7 +151,6 @@ async def run_autocatcher(token):
         if ctx.author.id != OWNER_ID:
             if time in ["30m", "1h", "3h", "1d"] and inter in ["10s", "20s", "30s"]:
                 await ctx.send(f"<@{POKETWO_ID}> incense buy {time} {inter} -y")
-
         else:
             await ctx.send(
                 f"Invalid Usage. Correct Usage : `{bot.command_prefix}incense <time> <interval>`"
@@ -185,7 +177,6 @@ async def run_autocatcher(token):
             return
 
         message = "```\n"
-
         for channel_id_str in channel_ids:
             try:
                 channel_id = int(channel_id_str)
@@ -434,7 +425,7 @@ async def run_autocatcher(token):
 
         # ========================================== SPAWN HANDLING ========================================== #
 
-        incense = ""
+        incense = "No incense active"  # Initialize as a string
         remaning_spawns = ""
         spawn_interval = ""
         time_left = ""
@@ -450,13 +441,12 @@ async def run_autocatcher(token):
                 # Stop Spamming
 
                 if message.embeds[0].footer.text:
-                    footer = message.embeds[0].footer.text
-
-                    footer.split("\n")
-                    incense = footer[0]
-                    remaning_spawns = footer[1]
-                    spawn_interval = footer[2]
-                    time_left = footer[3].split("at")[0]
+                    footer = message.embeds[0].footer.text.split("\n")
+                    if len(footer) >= 4:
+                        incense = footer[0].strip()
+                        remaning_spawns = footer[1].strip()
+                        spawn_interval = footer[2].strip()
+                        time_left = footer[3].split("at")[0].strip()
 
                 pokemon_image = message.embeds[
                     0
@@ -511,11 +501,6 @@ async def run_autocatcher(token):
             logger.info("Hint Solved")
 
         # ========================================== CATCH LOG HANDLING ========================================== #
-        incense = False
-        remaning_spawns = ""
-        spawn_interval = ""
-        time_left = ""
-
         if "congratulations" in message.content.lower() and bot.verified:
             bot.pokemons_caught += 1
 
@@ -545,7 +530,7 @@ async def run_autocatcher(token):
             embed1.set_thumbnail(url=pokemon["image"]["url"])
             embed1.set_timestamp()
 
-            if incense.lower() == "Incense: Active.".lower():
+            if incense and "incense: active." in incense.lower():
                 embed2 = DiscordEmbed(title="Incense Details", color="03b2f8")
                 embed2.set_description(
                     f"Remaining Spawns : {remaning_spawns}\nSpawn Interval : {spawn_interval}\nTime Left : {time_left}"
@@ -585,11 +570,9 @@ async def run_autocatcher(token):
 
     await bot.start(token)
 
-
 async def main(tokens):
     ac_tasks = [run_autocatcher(token) for token in tokens]
     await asyncio.gather(*ac_tasks)
-
 
 if __name__ == "__main__":
     asyncio.run(main(TOKENS))
