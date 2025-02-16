@@ -554,7 +554,7 @@ async def run_autocatcher(token):
                 embed2.set_author(
                     name="Pokefier",
                     url="https://github.com/sayaarcodes/pokefier",
-                    icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier
+                    icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png",
                 )
 
                 embed2.set_thumbnail(url=pokemon["image"]["url"])
