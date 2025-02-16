@@ -343,20 +343,22 @@ async def run_autocatcher(token):
 
                 else:
                     logger.info(f"Predicted Pokémon : {name} With Score : {score}")
+                    await message.channel.send("<@716390085896962058> h")
+                    logger.info("Requested Hint For Pokémon")
 
-        if "that is the wrong pokémon" in message.content.lower() and bot.verified:
+        if "that is the wrong pokémon" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
             logger.info("Wrong Pokémon Detected")
             await message.channel.send("<@716390085896962058> h")
             logger.info("Requested Hint For Wrong Pokémon")
 
-        if "the pokémon is" in message.content.lower() and bot.verified:
+        if "the pokémon is" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
             logger.info("Solving The Hint")
             hint = solve(message.content)
             await message.channel.send(f"<@716390085896962058> c {hint[0]}")
             logger.info("Hint Solved")
 
         # ========================================== CATCH LOG HANDLING ========================================== #
-        if "congratulations" in message.content.lower() and bot.verified:
+        if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
             bot.pokemons_caught += 1
             is_shiny = "these colors" in message.content.lower()
             pokemon_data = extract_pokemon_data(message.content)
