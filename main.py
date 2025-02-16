@@ -9,8 +9,8 @@ from discord.ext import commands
 from discord_webhook import DiscordEmbed
 
 # Pokefire Modules
-from Source.PKIdentify import Pokefier
-from Source.Utilities import (
+from source.PKIdentify import Pokefier
+from source.Utilities import (
     extract_pokemon_data,
     load_pokemon_data,
     remove_diacritics,
@@ -441,9 +441,11 @@ async def run_autocatcher(token):
 
         if message.embeds:
             if (
-                "wild" in message.embeds[0].title.lower() and bot.verified
+                message.embeds[0].title is not None
+                and "wild" in message.embeds[0].title.lower()
+                and bot.verified
             ):  # Checking If Pokémon Spawned And Bot Is Verified
-                logger.info("A Pokémon Spawned - Attemping To Predict")
+                logger.info("A Pokémon Spawned - Attempting To Predict")
 
                 # Stop Spamming
 
@@ -533,7 +535,7 @@ async def run_autocatcher(token):
 
             embed1 = DiscordEmbed(title="A Pokemon Was Caught!", color="03b2f8")
             embed1.set_description(
-                f"Account Name : {bot.user.name}\n\nPokémon Name : {pokemon_data['name']}\n\nPokémon Level : {pokemon_data['level']}\nPokémon IV : {pokemon_data['IV']}%\n\nShiny : {is_shiny}\nRarity : {pokemon['rarity']}\n\nPokémons Caught : {bot.pokemons_caught}"
+                f"Account Name : {bot.user.name}\n\nPokémon Name : {pokemon_data['name']}\n\nPokémon Level : {pokemon_data['level']}\nPokémon IV : {pokemon_data['IV']}%\n\nShiny : {is_shiny}\nRarity : {pokemon['rarity']}"
             )
             embed1.set_author(
                 name="Pokefier",
@@ -552,7 +554,7 @@ async def run_autocatcher(token):
                 embed2.set_author(
                     name="Pokefier",
                     url="https://github.com/sayaarcodes/pokefier",
-                    icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png",
+                    icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier
                 )
 
                 embed2.set_thumbnail(url=pokemon["image"]["url"])
