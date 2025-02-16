@@ -9,8 +9,8 @@ from discord.ext import commands
 from discord_webhook import DiscordEmbed
 
 # Pokefire Modules
-from source.PKIdentify import Pokefier
-from source.Utilities import (
+from Source.PKIdentify import Pokefier
+from Source.Utilities import (
     extract_pokemon_data,
     load_pokemon_data,
     remove_diacritics,
