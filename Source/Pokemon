@@ -26,8 +26,8 @@ Pikachu
 Raichu
 Sandshrew
 Sandslash
-Nidoran♂️
 Nidoran♀️
+Nidoran♂️
 Nidorina
 Nidoqueen
 Nidorino
@@ -148,7 +148,6 @@ Dratini
 Dragonair
 Dragonite
 Mewtwo
-Shadow Mewtwo
 Mew
 Chikorita
 Bayleef
@@ -249,6 +248,7 @@ Pupitar
 Tyranitar
 Lugia
 Ho-Oh
+Celebi
 Treecko
 Grovyle
 Sceptile
@@ -349,9 +349,6 @@ Armaldo
 Feebas
 Milotic
 Castform
-Sunny Castform
-Rainy Castform
-Snowy Castform
 Kecleon
 Shuppet
 Banette
@@ -385,6 +382,11 @@ Latios
 Kyogre
 Groudon
 Rayquaza
+Jirachi
+Deoxys
+Attack Deoxys
+Defense Deoxys
+Speed Deoxys
 Turtwig
 Grotle
 Torterra
@@ -489,18 +491,11 @@ Heatran
 Regigigas
 Giratina
 Cresselia
-Darkrai
-Arceus
-Magearna
-Celebi
-Jirachi
-Deoxys
-Attack Deoxys
-Defense Deoxys
-Speed Deoxys
 Phione
 Manaphy
+Darkrai
 Shaymin
+Arceus
 Victini
 Snivy
 Servine
@@ -559,7 +554,6 @@ Petilil
 Lilligant
 Basculin
 Blue-Striped Basculin
-Red-Striped Basculin
 Sandile
 Krokorok
 Krookodile
@@ -729,7 +723,6 @@ Xerneas
 Yveltal
 Zygarde
 10% Zygarde
-50% Zygarde
 Complete Zygarde
 Diancie
 Hoopa
@@ -800,6 +793,25 @@ Dhelmise
 Jangmo-o
 Hakamo-o
 Kommo-o
+Alolan-form
+Alolan Rattata
+Alolan Raticate
+Alolan Raichu
+Alolan Sandshrew
+Alolan Sandslash
+Alolan Vulpix
+Alolan Ninetales
+Alolan Diglett
+Alolan Dugtrio
+Alolan Meowth
+Alolan Persian
+Alolan Geodude
+Alolan Graveler
+Alolan Golem
+Alolan Grimer
+Alolan Muk
+Alolan Exeggutor
+Alolan Marowak
 Tapu Koko
 Tapu Lele
 Tapu Bulu
@@ -816,6 +828,7 @@ Celesteela
 Kartana
 Guzzlord
 Necrozma
+Magearna
 Marshadow
 Poipole
 Naganadel
@@ -824,6 +837,7 @@ Blacephalon
 Zeraora
 Meltan
 Melmetal
+Rookidee
 Grookey
 Thwackey
 Rillaboom
@@ -879,7 +893,7 @@ Grimmsnarl
 Obstagoon
 Perrserker
 Cursola
-Sirfetch’d
+Sirfetch'd
 Mr. Rime
 Runerigus
 Milcery
@@ -907,59 +921,34 @@ Zamazenta
 Eternatus
 Kubfu
 Urshifu
+Rapid Strike Urshifu
 Zarude
 Regieleki
 Regidrago
 Glastrier
 Spectrier
 Calyrex
-Alolan Rattata
-Alolan Raticate
-Alolan Raichu
-Alolan Sandshrew
-Alolan Sandslash
-Alolan Vulpix
-Alolan Ninetales
-Alolan Diglett
-Alolan Dugtrio
-Alolan Meowth
-Alolan Persian
-Alolan Geodude
-Alolan Graveler
-Alolan Golem
-Alolan Grimer
-Alolan Muk
-Alolan Exeggutor
-Alolan Marowak
-Anniversary Wooloo
-Sirfetch'd
-Galarian Zigzagoon
-Galarian Linoone
 Galarian Meowth
-Galarian Farfetch'd
-Galarian Stunfisk
-Galarian Corsola
-Galarian Weezing
-Galarian Yamask
 Galarian Ponyta
 Galarian Rapidash
+Galarian Slowpoke
+Galarian Slowbro
+Galarian Farfetch'd
+Galarian Weezing
 Galarian Mr. Mime
-Galarian Darumaka
-Galarian Darmanitan
-Galarian Moltres
 Galarian Articuno
 Galarian Zapdos
-Galarian Slowpoke
-Snowflake Bronzor
-Choco Sinistea
-Crystal Larvesta
-Snowy Amaura
-Spikey Cyndaquil
-Elsa Galarian Ponyta
-Snowman Pikachu
-Winter Sawsbuck
-Snowy Slowpoke
-Primal Glastrier
+Galarian Moltres
+Galarian Slowking
+Galarian Corsola
+Galarian Zigzagoon
+Galarian Linoone
+Galarian Darumaka
+Galarian Darmanitan
+Galarian Yamask
+Galarian Stunfisk
+Anniversary Wooloo
+Shadow Mewtwo
 Sprouting Oddish
 Bouquet Shaymin
 Cherry Blossom Cottonee
@@ -990,29 +979,7 @@ Hisuian Avalugg
 Hisuian Decidueye
 Origin Palkia
 Origin Dialga
-Therian EnamorusEnamorus
-Sharkfin Totodile
-Floatie Piplup
-Ukulele Pichu
-Grilling Snorlax
-Martini Dratini
-Surf Pikachu
-Autumn Chikorita
-Autumn Rapidash
-Autumn Snivy
-Autumn Pansage
-Autumn Skiddo
-Bug Catcher Weedle
-Flower Paras
-Hatching Beautifly
-Bird Nest Nuzleaf
-Spring Blooming Diancie
-Flower Pheromosa
-Eggneton
-Egg Hunter Kangaskhan
-Egg Basket Buneary
-Egg Searching Steenee 
-Kleavor
+Therian Enamorus
 Sprigatito
 Floragato
 Meowscarada
@@ -1118,6 +1085,125 @@ Koraidon
 Miraidon
 Walking Wake
 Iron Leaves
-Anniversary lapras
+Snowy Castform
+Sunny Castform
+Rainy Castform
 Skater Wooper
-Cupcake alcremie
+Anniversary Lapras
+Cupcake Alcremie
+Toadsie
+Mushroom Nacli
+Pumpkaboo Spice Latte
+Autumn Dachsbun
+Pile of Leaves Swalot
+Evil Mightyena
+Voodoo Spinda
+Pumpkin Gothorita
+Overgrown Shiinotic
+Ruined Golurk
+Hero Golurk
+Harvesting Ledian
+Cooking Chespin
+Nibbling Bunnelby
+Pear Flapple
+Santa H. Zorua
+Reindeer Deerling
+Pyjama Minccino
+Train Varoom
+Conductor Dragonite
+Pyjama Plusle
+Pyjama Minun
+Christmas Tree Smoliv
+Christmas Tree Dolliv
+Christmas Tree Arboliva
+Fireworks Cosmog
+Snow Leopard Sneasler
+Snowy Wormadam
+Snowmadam
+Polar Stufful
+Snow Leopard Sneasler
+Poltchageist
+Sinistcha
+Dipplin
+Munkidori
+Okidogi
+Fezandipiti
+Ogerpon
+Paldean Wooper
+Paldean Tauros
+Combat Breed Tauros
+Aqua Breed Tauros
+Blaze Breed Tauros
+Overgrown Mawile
+Blossom Cherrim
+Overgrown Carnivine
+Midday Lycanroc
+Dusk Lycanroc
+Midnight Lycanroc
+Roaming Gimmighoul
+Droopy Tatsugiri
+Stretchy Tatsugiri
+Archaludon
+Hydrapple
+Gouging Fire
+Raging Bolt
+Iron Boulder
+Iron Crown
+Terapagos
+Pecharunt
+Blue Plumage Squawkabilly
+Yellow Plumage Squawkabilly
+White Plumage Squawkabilly
+Heat Rotom
+Wash Rotom
+Frost Rotom
+Fan Rotom
+Mow Rotom
+Cornerstone Mask Ogerpon
+Wellspring Mask Ogerpon
+Hearthflame Mask Ogerpon
+Zygarde Cell
+Zygarde Core
+Gulping Cramorant
+Gorging Cramorant
+Zenith Marshadow
+Pirouette Meloetta
+Noice Face Eiscue
+White-Striped Basculin
+Bloodmoon Ursaluna
+School Wishiwashi
+Blade Aegislash
+Amped Toxtricity
+Hero Palafin
+Family of Three Maushold
+Zen Darmanitan
+Galarian Zen Darmanitan
+Low Key Toxtricity
+Hangry Morpeko
+Three-Segment Dudunsparce
+Terastal Terapagos
+Partner Pikachu
+Partner Eevee
+Dada Zarude
+Pride Ampharos
+Rainbow Minior
+Painted Acorn Skwovet
+Gradient Chi-yu
+Waterpolo Ducklett
+Boxel
+Cheerleader Oricorio
+Moon Fairy Mudkip
+Flower Fairy Flabébé
+Fire Fairy Salandit
+Alebrije Pyroar
+Papel Picado Pidgey
+Sweater Teddiursa
+Leafy Baltoy
+Cosy Perrserker
+Candy Cane Wiglett
+Elf Audino
+Paper Lantern Lampent
+Wooden Serperior
+Lion Dancer Litleo
+Hearts Fidough
+Love Bombirdier
