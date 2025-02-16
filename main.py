@@ -326,23 +326,26 @@ async def run_autocatcher(token):
 
                 pokemon_image = message.embeds[0].image.url  # Get The Image URL Of The Pokémon
                 predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict The Pokémon Using Pokefier
-                predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])  # Get The Pokémon With Highest Score
-                name = predicted_pokemon[0]  # Get The Name Of The Pokémon
-                score = predicted_pokemon[1]  # Get The Score Of The Pokémon
+                if predicted_pokemons:
+                    predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])  # Get The Pokémon With Highest Score
+                    name = predicted_pokemon[0]  # Get The Name Of The Pokémon
+                    score = predicted_pokemon[1]  # Get The Score Of The Pokémon
 
-                bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]  # Get The Blacklisted Pokemons
-                if name.lower() in bot.blacklisted_pokemons:
-                    logger.info(f"Pokémon : {name} Was Not Caught Because It Is Blacklisted")
-                    return
+                    bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]  # Get The Blacklisted Pokemons
+                    if name.lower() in bot.blacklisted_pokemons:
+                        logger.info(f"Pokémon : {name} Was Not Caught Because It Is Blacklisted")
+                        return
 
-                if score > 30.0:  # 30 Is The Threshold Score
-                    alt_name = await bot.get_alternate_pokemon_name(name, languages=bot.languages)
-                    alt_name = remove_diacritics(alt_name)
-                    await message.channel.send(f"<@716390085896962058> c {alt_name}")
-                    logger.info(f"Predicted Pokémon : {name} With Score : {score}")
-
+                    if score > 30.0:  # 30 Is The Threshold Score
+                        alt_name = await bot.get_alternate_pokemon_name(name, languages=bot.languages)
+                        alt_name = remove_diacritics(alt_name)
+                        await message.channel.send(f"<@716390085896962058> c {alt_name}")
+                        logger.info(f"Predicted Pokémon : {name} With Score : {score}")
+                    else:
+                        logger.info(f"Predicted Pokémon : {name} With Score : {score}")
                 else:
-                    logger.info(f"Predicted Pokémon : {name} With Score : {score}")
+                    logger.info("Predicted Pokémon Score Not Found - Requesting Hint")
+                    await message.channel.send("<@716390085896962058> h")
 
         if "that is the wrong pokémon" in message.content.lower() and bot.verified:
             logger.info("Wrong Pokémon Detected")
