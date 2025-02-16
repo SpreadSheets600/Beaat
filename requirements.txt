@@ -1,0 +1,8 @@
+discord-py-self
+discord-webhook
+logging
+numpy
+python-dotenv
+ruff
+streamlit
+tensorflow
