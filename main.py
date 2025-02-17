@@ -134,22 +134,23 @@ async def run_autocatcher(token):
     async def help(ctx):
         if ctx.author.id == OWNER_ID:
             message = (
+                """
             "**Commands**\n"
-            "`shard` - Buy Shards\n"
-            "`help` - View This Message\n"
-            "`incense` - Start The Incense\n"
-            "`say` - Make The Bot Say Something\n"
-            "`ping` - Check If The Bot Is Online\n"
-            "`trade` - Request A Trade With A User\n"
-            "`config` - View The Current Configuration\n"
-            "`solved` - Confirm That The Captcha Was Solved\n"
-            "`channeladd` - Add A Channel To The Whitelist\n"
-            "`channelremove` - Remove A Channel From The Whitelist\n"
-            "`blacklistadd` - Add A Pokémon To The Blacklist\n"
-            "`blacklistremove` - Remove A Pokémon From The Blacklist\n"
-            "`languageadd` - Add A Language To The Language List\n"
-            "`languageremove` - Remove A Language From The Language List"
-            )
+            "shard - Buy Shards\n"
+            "help - View This Message\n"
+            "incense - Start The Incense\n"
+            "say - Make The Bot Say Something\n"
+            "ping - Check If The Bot Is Online\n"
+            "trade - Request A Trade With A User\n"
+            "config - View The Current Configuration\n"
+            "solved - Confirm That The Captcha Was Solved\n"
+            "channeladd - Add A Channel To The Whitelist\n"
+            "channelremove - Remove A Channel From The Whitelist\n"
+            "blacklistadd - Add A Pokémon To The Blacklist\n"
+            "blacklistremove - Remove A Pokémon From The Blacklist\n"
+            "languageadd - Add A Language To The Language List\n"
+            "languageremove - Remove A Language From The Language List"
+          """  )
             await ctx.send(message)
 
 
@@ -308,7 +309,9 @@ async def run_autocatcher(token):
     @bot.command()
     async def say(ctx, *, message):
         if ctx.message.author.id == OWNER_ID:
-            await ctx.send(message)
+            if "p2" in message.lower():
+                message = message.replace("p2", f"<@{POKETWO_ID}>")
+                await ctx.send(message)
 
     @bot.event
     async def on_message(message):
