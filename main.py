@@ -127,36 +127,35 @@ async def run_autocatcher(token):
     @bot.command()
     async def trade(ctx, user: str):
         if ctx.author.id == OWNER_ID:
-        await ctx.send(f"<@{POKETWO_ID}> trade {user}")
-        logger.info(f"Trade Request Sent To {user}")
+            await ctx.send(f"<@{POKETWO_ID}> trade {user}")
+            logger.info(f"Trade Request Sent To {user}")
 
     @bot.command()
     async def help(ctx):
         if ctx.author.id == OWNER_ID:
-        message = """
-        **Commands**
-        `shard` - To Buy Shards
-        `help` - To View This Message
-        `incense` - To Start The Incense
+            message = """
+            **Commands**
+            `shard` - To Buy Shards
+            `help` - To View This Message
+            `incense` - To Start The Incense
 
-        `say` - To Make The Bot Say Something
-        `ping ` - To Check If The Bot Is Online
-        `trade` - To Request A Trade With A User
-        `config` - To View The Current Configuration
-        `solved` - To Confirm That The Captcha Was Solved
-        
-        `channeladd` - To Add A Channel To The Whitelist
-        `channelremove` - To Remove A Channel From The Whitelist
-        
-        `blacklistadd` - To Add A Pokemon To The Blacklist
-        `blacklistremove` - To Remove A Pokemon From The Blacklist
-        
-        `languageadd` - To Add A Language To The Language List
-        `languageremove` - To Remove A Language From The Language List
-        """
-        
-        time.sleep(random.choice(DELAY))
-        await ctx.send(message)
+            `say` - To Make The Bot Say Something
+            `ping` - To Check If The Bot Is Online
+            `trade` - To Request A Trade With A User
+            `config` - To View The Current Configuration
+            `solved` - To Confirm That The Captcha Was Solved
+
+            `channeladd` - To Add A Channel To The Whitelist
+            `channelremove` - To Remove A Channel From The Whitelist
+
+            `blacklistadd` - To Add A Pokemon To The Blacklist
+            `blacklistremove` - To Remove A Pokemon From The Blacklist
+
+            `languageadd` - To Add A Language To The Language List
+            `languageremove` - To Remove A Language From The Language List
+            """
+            time.sleep(random.choice(DELAY))
+            await ctx.send(message)
 
     @bot.command()
     async def ping(ctx):
@@ -179,9 +178,9 @@ async def run_autocatcher(token):
         if ctx.author.id == OWNER_ID:
             if amt > 0:
                 await ctx.send(f"<@{POKETWO_ID}> buy shards {amt}")
-        else:
-            await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`")
-    
+            else:
+                await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`")
+
     @bot.command()
     async def channeladd(ctx, *channel_ids):
         if ctx.author.id == OWNER_ID:
@@ -192,14 +191,13 @@ async def run_autocatcher(token):
             for channel_id_str in channel_ids:
                 try:
                     channel_id = int(channel_id_str)
+                    if channel_id in bot.whitelisted_channels:
+                        message += f"Channel ID : {channel_id} Is Already Whitelisted\n"
+                    else:
+                        bot.whitelisted_channels.append(channel_id)
+                        message += f"Channel ID : {channel_id} Whitelisted\n"
                 except ValueError:
                     await ctx.reply(f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID.")
-                    continue
-                if channel_id in bot.whitelisted_channels:
-                    message += f"Channel ID : {channel_id} Is Already Whitelisted\n"
-                else:
-                    bot.whitelisted_channels.append(channel_id)
-                    message += f"Channel ID : {channel_id} Whitelisted\n"
             message += "```"
             await ctx.send(message)
 
@@ -213,14 +211,13 @@ async def run_autocatcher(token):
             for channel_id_str in channel_ids:
                 try:
                     channel_id = int(channel_id_str)
+                    if channel_id in bot.whitelisted_channels:
+                        bot.whitelisted_channels = [ch_id for ch_id in bot.whitelisted_channels if ch_id != channel_id]
+                        message += f"Channel ID : {channel_id} Removed From Whitelist\n"
+                    else:
+                        message += f"Channel ID : {channel_id} Is Not Whitelisted\n"
                 except ValueError:
                     await ctx.reply(f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID.")
-                    continue
-                if channel_id in bot.whitelisted_channels:
-                    bot.whitelisted_channels = [ch_id for ch_id in bot.whitelisted_channels if ch_id != channel_id]
-                    message += f"Channel ID : {channel_id} Removed From Whitelist\n"
-                else:
-                    message += f"Channel ID : {channel_id} Is Not Whitelisted\n"
             message += "```"
             await ctx.send(message)
 
@@ -328,10 +325,13 @@ async def run_autocatcher(token):
             # Trade Accept
             if "requesting a trade with" in message.content.lower():
                 logger.info("Trade Request Received")
-                if message.components[0].children[0].label.lower() == "accept":  # Checking If Accept Button Is Present
-                    await asyncio.sleep(random.choice(DELAY))  # Delay Before Accepting Trade For Human Replication
-                    await message.components[0].children[0].click()  # Clicking The Accept Button
-                logger.info("Trade Accepted")
+                try:
+                    if message.components[0].children[0].label.lower() == "accept":  # Checking If Accept Button Is Present
+                        await asyncio.sleep(random.choice(DELAY))  # Delay Before Accepting Trade For Human Replication
+                        await message.components[0].children[0].click()  # Clicking The Accept Button
+                    logger.info("Trade Accepted")
+                except Exception as e:
+                    logger.error(f"Error in trade acceptance: {e}")
 
             # Trade Confirmation
             if message.embeds:
@@ -344,7 +344,7 @@ async def run_autocatcher(token):
                         confirm_button = message.components[0].children[0]
 
                         if confirm_button.label and confirm_button.label.strip().lower() == "confirm":
-                            time.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
+                            await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
                             await confirm_button.click()  # Clicking The Confirm Button
 
                     logger.info("Trade Completed")
@@ -352,10 +352,13 @@ async def run_autocatcher(token):
             # ========================================== SHARDS HANDLING ========================================== #
             if "are you sure you want to exchange" in message.content.lower():
                 logger.info("A Shard Buy Message Received")
-                if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
-                    await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
-                    await message.components[0].children[0].click()  # Clicking The Confirm Button
-                logger.info("Shard Bought")
+                try:
+                    if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
+                        await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
+                        await message.components[0].children[0].click()  # Clicking The Confirm Button
+                    logger.info("Shard Bought")
+                except Exception as e:
+                    logger.error(f"Error in shard buying: {e}")
 
             if "you don't have enough shards" in message.content.lower():
                 logger.info("Not Enough Shards To Buy Incense")
