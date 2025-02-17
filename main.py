@@ -103,6 +103,7 @@ class Autocatcher(commands.Bot):
 
 async def run_autocatcher(token):
     bot = Autocatcher()  # Initialize Bot
+    bot.remove_command("help")
 
     @bot.event
     async def on_ready():
@@ -122,6 +123,40 @@ async def run_autocatcher(token):
         bot.pokemons_caught = 0  # Set Global Pokemon Counter To 0
 
     # ========================================== SPAM TASKS ========================================== #
+
+    @bot.command()
+    async def trade(ctx, user: str):
+        if ctx.author.id == OWNER_ID:
+        await ctx.send(f"<@{POKETWO_ID}> trade {user}")
+        logger.info(f"Trade Request Sent To {user}")
+
+    @bot.command()
+    async def help(ctx):
+        if ctx.author.id == OWNER_ID:
+        message = """
+        **Commands**
+        `shard` - To Buy Shards
+        `help` - To View This Message
+        `incense` - To Start The Incense
+
+        `say` - To Make The Bot Say Something
+        `ping ` - To Check If The Bot Is Online
+        `trade` - To Request A Trade With A User
+        `config` - To View The Current Configuration
+        `solved` - To Confirm That The Captcha Was Solved
+        
+        `channeladd` - To Add A Channel To The Whitelist
+        `channelremove` - To Remove A Channel From The Whitelist
+        
+        `blacklistadd` - To Add A Pokemon To The Blacklist
+        `blacklistremove` - To Remove A Pokemon From The Blacklist
+        
+        `languageadd` - To Add A Language To The Language List
+        `languageremove` - To Remove A Language From The Language List
+        """
+        
+        time.sleep(random.choice(DELAY))
+        await ctx.send(message)
 
     @bot.command()
     async def ping(ctx):
@@ -146,7 +181,7 @@ async def run_autocatcher(token):
                 await ctx.send(f"<@{POKETWO_ID}> buy shards {amt}")
         else:
             await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`")
-
+    
     @bot.command()
     async def channeladd(ctx, *channel_ids):
         if ctx.author.id == OWNER_ID:
@@ -321,7 +356,7 @@ async def run_autocatcher(token):
                     await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
                     await message.components[0].children[0].click()  # Clicking The Confirm Button
                 logger.info("Shard Bought")
-            
+
             if "you don't have enough shards" in message.content.lower():
                 logger.info("Not Enough Shards To Buy Incense")
                 await message.channel.send("Not Enough Shards To Buy Incense")
