@@ -87,7 +87,7 @@ class Autocatcher(commands.Bot):
         pokemon = next((p for p in self.pokemon_data if p["name"].lower() == name.lower()), None)
         if pokemon:
             alternate_names = [
-                alt_name for alt_name in pokemon.get("altnames", []) 
+                alt_name for alt_name in pokemon.get("altnames", [])
                 if alt_name.get("language").lower() in languages
             ]
             if alternate_names:
@@ -128,23 +128,23 @@ async def run_autocatcher(token):
     async def help(ctx):
         if ctx.author.id == OWNER_ID:
             message = (
-            """
-            **Commands**\n
-            `shard` - Buy Shards\n
-            `help` - View This Message\n
-            `incense` - Start The Incense\n
-            `say` - Make The Bot Say Something\n
-            `ping` - Check If The Bot Is Online\n
-            `trade` - Request A Trade With A User\n
-            `config` - View The Current Configuration\n
-            `solved` - Confirm That The Captcha Was Solved\n
-            `channeladd` - Add A Channel To The Whitelist\n
-            `channelremove` - Remove A Channel From The Whitelist\n
-            `blacklistadd` - Add A Pokémon To The Blacklist\n
-            `blacklistremove` - Remove A Pokémon From The Blacklist\n
-            `languageadd` - Add A Language To The Language List\n
-            `languageremove` - Remove A Language From The Language List
-            """
+                """
+                **Commands**\n
+                `shard` - Buy Shards\n
+                `help` - View This Message\n
+                `incense` - Start The Incense\n
+                `say` - Make The Bot Say Something\n
+                `ping` - Check If The Bot Is Online\n
+                `trade` - Request A Trade With A User\n
+                `config` - View The Current Configuration\n
+                `solved` - Confirm That The Captcha Was Solved\n
+                `channeladd` - Add A Channel To The Whitelist\n
+                `channelremove` - Remove A Channel From The Whitelist\n
+                `blacklistadd` - Add A Pokémon To The Blacklist\n
+                `blacklistremove` - Remove A Pokémon From The Blacklist\n
+                `languageadd` - Add A Language To The Language List\n
+                `languageremove` - Remove A Language From The Language List
+                """
             )
             await ctx.send(message)
 
@@ -304,6 +304,8 @@ async def run_autocatcher(token):
         if ctx.message.author.id == OWNER_ID:
             if "p2" in message.lower():
                 message = message.replace("p2", f"<@{POKETWO_ID}>")
+                await ctx.send(message)
+            else:
                 await ctx.send(message)
 
     @bot.event
