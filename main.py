@@ -114,7 +114,7 @@ async def run_autocatcher(token):
         logger.info(f"+ Blacklisted Pokemons: {bot.blacklisted_pokemons}")
         logger.info("+ ====================================== +")
 
-        bot.load_extension("handler.command")
+        await bot.load_extension("handler.command")
         print("Loaded Commands")
 
         bot.started = time.time()  # Stats The Time
