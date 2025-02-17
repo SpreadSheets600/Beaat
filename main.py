@@ -116,8 +116,6 @@ async def run_autocatcher(token: str) -> None:
         bot.verified = True
         bot.pokemons_caught = 0
 
-    # ========================================== COMMANDS ========================================== #
-
     @bot.command()
     async def trade(ctx, user: str) -> None:
         if ctx.author.id == OWNER_ID:
