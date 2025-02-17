@@ -304,7 +304,7 @@ async def run_autocatcher(token):
 
             # Trade Confirmation
             if message.embeds and message.embeds[0].description:
-                if "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in message.embeds[0].description.lower():
+                if "Are you sure you want to confirm this trade? Please make sure that you are trading what you intended to." in message.embeds[0].description.lower():
                     logger.info("Trade Confirmation Received")
                     if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
                         await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
