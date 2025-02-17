@@ -366,7 +366,7 @@ async def run_autocatcher(token):
                 await message.channel.send(f"To Buy Shards Use `{bot.command_prefix}shardbuy <amount>`")
 
             # ========================================== SPAWN HANDLING ========================================== #
-            incense = None
+            incense = ""
             remaining_spawns = ""
             spawn_interval = ""
             time_left = ""
@@ -417,6 +417,10 @@ async def run_autocatcher(token):
                 logger.info("Hint Solved")
 
             # ========================================== CATCH LOG HANDLING ========================================== #
+            incense = False
+            remaining_spawns = ""
+            spawn_interval = ""
+            time_left = ""
             if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
                 bot.pokemons_caught += 1
                 is_shiny = "these colors" in message.content.lower()
