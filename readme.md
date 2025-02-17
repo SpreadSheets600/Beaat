@@ -1,81 +1,58 @@
-# Pokefier Bot Implementation Details
+# ⚙️ Pokefier Bot Detailed Overview
 
-## Execution Flow
-- The bot initializes and logs its activities.
-- It reads configuration from a JSON file, including settings for delays, tokens, and other operational parameters.
-- The bot listens to commands and messages on Discord and processes them accordingly.
+## 📜 Description
+The **Pokefier Bot** is a Discord bot designed to automate interactions with the Poketwo game. It supports various commands for trading, catching Pokémon, and managing configurations.
 
-## Commands Overview
-The bot listens for specific commands which can be used by the owner. Below are the commands implemented:
+## ## 🚀 Execution Flow
+1. **Initialization**: The bot initializes and sets up logging.
+2. **Configuration**: Reads settings from a JSON file.
+3. **Event Listening**: Listens for commands and messages on Discord.
+4. **Command Processing**: Executes commands based on user input.
 
-### Commands
-- **trade `<user>`**
-  - Purpose: Request a trade with a specified user.
+## ✨ Features
+
+- **Automation**: Automates Pokémon catching and trading processes.
+- **Custom Commands**: Execute a wide range of commands to interact with Poketwo.
+- **Real-time Interaction**: Responds to game events instantaneously.
+- **Logging**: Maintains detailed logs of operations and errors.
   
-- **help**
-  - Purpose: Displays all available commands.
+## 🛠️ Commands Overview
 
-- **ping**
-  - Purpose: Checks the latency of the bot.
+| Command             | Description                                                    |
+|---------------------|----------------------------------------------------------------|
+| **`trade <user>`**  | Request a trade with a specified user.                       |
+| **`help`**          | Displays all available commands.                             |
+| **`ping`**          | Checks the latency of the bot.                               |
+| **`incense <time> <interval>`** | Starts an incense session with specified time and interval. Valid time options: `30m`, `1h`, `3h`, `1d`. Valid interval options: `10s`, `20s`, `30s`. |
+| **`shardbuy <amount>`** | Buy a specified number of shards.                            |
+| **`channeladd <channel_ids>`** | Adds specified channel IDs to the whitelist.          |
+| **`channelremove <channel_ids>`** | Removes specified channel IDs from the whitelist.    |
+| **`blacklistadd <pokemons>`** | Adds specified Pokémon to the blacklist.               |
+| **`blacklistremove <pokemons>`** | Removes specified Pokémon from the blacklist.        |
+| **`languageadd <languages>`** | Adds specified languages to the bot's supported languages. |
+| **`languageremove <languages>`** | Removes specified languages from the supported list.   |
+| **`solved`**       | Confirms that the captcha has been solved.                   |
+| **`config`**       | Displays the current configuration settings.                  |
+| **`say <message>`** | Make the bot send a specified message.                        |
 
-- **incense `<time>` `<interval>`**
-  - Purpose: Starts an incense session with specified time and interval.
-  - Valid Time Options: `30m`, `1h`, `3h`, `1d`
-  - Valid Interval Options: `10s`, `20s`, `30s`
+## 🔍 Event Handling
+- Detects and processes Pokémon spawn messages.
+- Handles trade requests and confirmations.
+- Logs information and errors for monitoring purposes.
 
-- **shardbuy `<amount>`**
-  - Purpose: Allows the owner to buy a specified number of shards.
+## 📝 Configuration Read
+The bot’s configuration is loaded from `config.json`, where you can set:
+- **DELAY**: Delay times for processing.
+- **TOKENS**: Bot tokens for multiple instances.
+- **LOGGING**: Turn logging on or off.
+- **OWNER_ID**: Your Discord ID for command permissions.
+- **POKETWO_ID**: The ID for Poketwo interactions.
+- **BLACKLISTED_POKEMONS**: Pokémon that should not be caught.
+- **WHITELISTED_CHANNELS**: Channels where the bot is allowed to operate.
+- **LANGUAGES**: Supported languages for commands.
 
-- **channeladd `<channel_ids>`**
-  - Purpose: Add specified channel IDs to the whitelist.
-
-- **channelremove `<channel_ids>`**
-  - Purpose: Remove specified channel IDs from the whitelist.
-
-- **blacklistadd `<pokemons>`**
-  - Purpose: Add specified Pokémon to the blacklist.
-  
-- **blacklistremove `<pokemons>`**
-  - Purpose: Remove specified Pokémon from the blacklist.
-
-- **languageadd `<languages>`**
-  - Purpose: Add specified languages to the bot's supported languages.
-
-- **languageremove `<languages>`**
-  - Purpose: Remove specified languages from the supported list.
-
-- **solved**
-  - Purpose: Confirms that the captcha has been solved.
-
-- **config**
-  - Purpose: Displays the current configuration settings.
-
-- **say `<message>`**
-  - Purpose: Make the bot send a specified message.
-
-## Event Handling
-The bot handles various events including:
-- Capturing messages from Poketwo and determining actions based on content.
-- Processing trade requests and confirmations.
-- Managing Pokémon spawn messages and responding accordingly.
-- Log information for actions taken and errors encountered.
-
-## Logging
-Logs are maintained at various levels (info, warning, error, and debug) to trace the bot's operations and any issues.
-
-## Configuration Details
-Configuration parameters are read from `config.json`, including:
-- DELAY
-- TOKENS
-- OWNER_ID
-- LOGGING
-- POKETWO_ID
-- BLACKLISTED_POKEMONS
-- WHITELISTED_CHANNELS
-- Supported languages
-
-## License
-This project is open-source, available for modification according to the user's needs.
+## 📄 Licensing
+This project is **open-source**, allowing users to modify it according to their requirements.
 
 # Conclusion
-The Pokefier bot runs autonomously to interact with the Poketwo game on Discord, following predefined command structures and configurations, with the ability to catch Pokémon, engage in trades, and maintain a log of all activities.
+The Pokefier Bot enhances your gameplay experience by automating essential tasks and providing real-time interaction with the Poketwo game. Customize it further to suit your specific needs!
