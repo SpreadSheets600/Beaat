@@ -138,19 +138,15 @@ async def run_autocatcher(token):
             `shard` - To Buy Shards
             `help` - To View This Message
             `incense` - To Start The Incense
-
             `say` - To Make The Bot Say Something
             `ping` - To Check If The Bot Is Online
             `trade` - To Request A Trade With A User
             `config` - To View The Current Configuration
             `solved` - To Confirm That The Captcha Was Solved
-
             `channeladd` - To Add A Channel To The Whitelist
             `channelremove` - To Remove A Channel From The Whitelist
-
             `blacklistadd` - To Add A Pokemon To The Blacklist
             `blacklistremove` - To Remove A Pokemon From The Blacklist
-
             `languageadd` - To Add A Language To The Language List
             `languageremove` - To Remove A Language From The Language List
             """
@@ -185,7 +181,7 @@ async def run_autocatcher(token):
     async def channeladd(ctx, *channel_ids):
         if ctx.author.id == OWNER_ID:
             if not channel_ids:
-                await ctx.reply("`You Must Provide Atleast One Channel ID. Separate Multiple IDs With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`")
                 return
             message = "```\n"
             for channel_id_str in channel_ids:
@@ -205,7 +201,7 @@ async def run_autocatcher(token):
     async def channelremove(ctx, *channel_ids):
         if ctx.author.id == OWNER_ID:
             if not channel_ids:
-                await ctx.reply("`You Must Provide Atleast One Channel ID. Separate Multiple IDs With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`")
                 return
             message = "```\n"
             for channel_id_str in channel_ids:
@@ -225,7 +221,7 @@ async def run_autocatcher(token):
     async def languageadd(ctx, *languages):
         if ctx.author.id == OWNER_ID:
             if not languages:
-                await ctx.reply("`You Must Provide Atleast One Language. Separate Multiple Languages With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`")
                 return
             message = "```\n"
             valid_languages = ["english", "french", "german", "japanese"]
@@ -245,7 +241,7 @@ async def run_autocatcher(token):
     async def languageremove(ctx, *languages):
         if ctx.author.id == OWNER_ID:
             if not languages:
-                await ctx.reply("`You Must Provide Atleast One Language. Separate Multiple Languages With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`")
                 return
             message = "```\n"
             valid_languages = ["english", "french", "german", "japanese"]
@@ -265,7 +261,7 @@ async def run_autocatcher(token):
     async def blacklistadd(ctx, *pokemons):
         if ctx.author.id == OWNER_ID:
             if not pokemons:
-                await ctx.reply("`You Must Provide Atleast One Pokemon. Separate Multiple Pokemons With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
                 return
             message = "```\n"
             bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
@@ -282,7 +278,7 @@ async def run_autocatcher(token):
     async def blacklistremove(ctx, *pokemons):
         if ctx.author.id == OWNER_ID:
             if not pokemons:
-                await ctx.reply("`You Must Provide Atleast One Pokemon. Separate Multiple Pokemons With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
                 return
             message = "```\n"
             bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
@@ -340,10 +336,8 @@ async def run_autocatcher(token):
                 if embed.author and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.author.name.lower():
                     logger.info("Trade Confirmation Received")
 
-                    if (
-                        message.components[0].children[0].label.lower() == "confirm"
-                    ):
-                        await time.sleep(random.choice(DELAY))
+                    if message.components[0].children[0].label.lower() == "confirm":
+                        await asyncio.sleep(random.choice(DELAY))
                         await message.components[0].children[0].click()
 
                     logger.info("Trade Completed")
