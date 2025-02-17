@@ -120,27 +120,26 @@ async def run_autocatcher(token: str) -> None:
     async def trade(ctx, user: str) -> None:
         if ctx.author.id == OWNER_ID:
             await ctx.send(f"<@{POKETWO_ID}> trade {user}")
-            logger.info(f"Trade Request Sent To {user}")
 
     @bot.command()
     async def help(ctx):
         if ctx.author.id == OWNER_ID:
             message = (
             "```\n"
-            "Commands:\n"
-            "shard - Buy Shards\n"
-            "help - View This Message\n"
-            "incense - Start The Incense\n"
-            "say - Make The Bot Say Something\n"
-            "ping - Check If The Bot Is Online\n"
-            "trade - Request A Trade With A User\n"
-            "config - View The Current Configuration\n"
-            "solved - Confirm That The Captcha Was Solved\n"
-            "channeladd - Add A Channel To The Whitelist\n"
-            "channelremove - Remove A Channel From The Whitelist\n"
-            "blacklistadd - Add A Pokémon To The Blacklist\n"
-            "blacklistremove - Remove A Pokémon From The Blacklist\n"
-            "languageadd - Add A Language To The Language List\n"
+            "Commands:\n\n"
+            "shard - Buy Shards\n\n"
+            "help - View This Message\n\n"
+            "incense - Start The Incense\n\n"
+            "say - Make The Bot Say Something\n\n"
+            "ping - Check If The Bot Is Online\n\n"
+            "trade - Request A Trade With A User\n\n"
+            "config - View The Current Configuration\n\n"
+            "solved - Confirm That The Captcha Was Solved\n\n"
+            "channeladd - Add A Channel To The Whitelist\n\n"
+            "channelremove - Remove A Channel From The Whitelist\n\n"
+            "blacklistadd - Add A Pokémon To The Blacklist\n\n"
+            "blacklistremove - Remove A Pokémon From The Blacklist\n\n"
+            "languageadd - Add A Language To The Language List\n\n"
             "languageremove - Remove A Language From The Language List\n"
             "```"
             )
@@ -311,40 +310,30 @@ async def run_autocatcher(token: str) -> None:
         await bot.process_commands(message)
 
         if message.author.id == POKETWO_ID and message.channel.id in bot.whitelisted_channels:
-            logger.info("Message Received From POKETWO")
-            logger.info("Attempting To Process Message")
-
             if "requesting a trade with" in message.content.lower():
-                logger.info("Trade Request Received")
                 try:
                     if message.components[0].children[0].label.lower() == "accept":
                         time.sleep(random.choice(DELAY))
                         await message.components[0].children[0].click()
-                    logger.info("Trade Accepted")
                 except Exception as e:
-                    logger.error(f"Error in trade acceptance: {e}")
+                    pass
 
             if message.embeds:
                 embed = message.embeds[0]
                 if embed.author and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.author.name.lower():
-                    logger.info("Trade Confirmation Received")
                     if message.components[0].children[0].label.lower() == "confirm":
                         time.sleep(random.choice(DELAY))
                         await message.components[0].children[0].click()
-                    logger.info("Trade Completed")
 
             if "are you sure you want to exchange" in message.content.lower():
-                logger.info("A Shard Buy Message Received")
                 try:
                     if message.components[0].children[0].label.lower() == "confirm":
                         time.sleep(random.choice(DELAY))
                         await message.components[0].children[0].click()
-                    logger.info("Shard Bought")
                 except Exception as e:
-                    logger.error(f"Error in shard buying: {e}")
+                    pass 
 
             if "you don't have enough shards" in message.content.lower():
-                logger.info("Not Enough Shards To Buy Incense")
                 await message.channel.send("Not Enough Shards To Buy Incense")
                 await message.channel.send(f"To Buy Shards Use `{bot.command_prefix}shardbuy <amount>`")
 
@@ -356,7 +345,6 @@ async def run_autocatcher(token: str) -> None:
 
             if message.embeds:
                 if message.channel.id in bot.whitelisted_channels and message.embeds[0].title and "wild" in message.embeds[0].title.lower() and bot.verified:
-                    logger.info("A Pokémon Spawned - Attempting To Predict")
                     if message.embeds[0].footer.text:
                         footer = message.embeds[0].footer.text.split("\n")
                         incense = footer[0]
@@ -368,11 +356,10 @@ async def run_autocatcher(token: str) -> None:
                     predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict the Pokémon
                     predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])
                     name = predicted_pokemon[0]
-                    score = predicted_pokemon[1]
+                    score = predicted_pokemons[1]
 
                     bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
                     if name.lower() in bot.blacklisted_pokemons:
-                        logger.info(f"Pokémon : {name} Was Not Caught Because It Is Blacklisted")
                         return
 
                     if score > 30.0:
@@ -386,16 +373,12 @@ async def run_autocatcher(token: str) -> None:
                         await message.channel.send("<@716390085896962058> h")
 
             if "that is the wrong pokémon" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
-                logger.info("Wrong Pokémon Detected")
                 await message.channel.send("<@716390085896962058> h")
-                logger.info("Requested Hint For Wrong Pokémon")
 
             if "the pokémon is" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
-                logger.info("Solving The Hint")
                 hint = solve(message.content)
                 time.sleep(random.choice(DELAY))
                 await message.channel.send(f"<@716390085896962058> c {hint[0]}")
-                logger.info("Hint Solved")
 
             if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
                 bot.pokemons_caught += 1
@@ -437,13 +420,10 @@ async def run_autocatcher(token: str) -> None:
                 send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
 
             if f"https://verify.poketwo.net/captcha/{bot.user.id}" in message.content and bot.verified:
-                logger.info("A Captcha Challenge Was Received")
                 bot.verified = False
                 await message.channel.send("<@716390085896962058> incense pause")
-                logger.info("Incense Paused")
                 owner_dm = await bot.fetch_user(OWNER_ID)
                 await owner_dm.send(f"Captcha Challenge Received. Please Solve It.\n\n{message.content}")
-                logger.info("Captcha Challenge Sent To Owner")
 
     await bot.start(token)
 
