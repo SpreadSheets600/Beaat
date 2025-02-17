@@ -304,116 +304,116 @@ async def run_autocatcher(token):
 
             # Trade Confirmation
             if message.embeds:
-    embed = message.embeds[0]
+                embed = message.embeds[0]
 
-    if embed.description and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.description.strip().lower():
-        logger.info("Trade Confirmation Received")
+                if embed.description and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.description.strip().lower():
+                    logger.info("Trade Confirmation Received")
 
-        if message.components and message.components[0].children:
-            confirm_button = message.components[0].children[0]
+                    if message.components and message.components[0].children:
+                        confirm_button = message.components[0].children[0]
 
-            if confirm_button.label and confirm_button.label.strip().lower() == "confirm":
-                time.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
-                await confirm_button.click()  # Clicking The Confirm Button
+                        if confirm_button.label and confirm_button.label.strip().lower() == "confirm":
+                            time.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
+                            await confirm_button.click()  # Clicking The Confirm Button
 
-        logger.info("Trade Completed")
+                    logger.info("Trade Completed")
 
-        # ========================================== SHARDS HANDLING ========================================== #
-        if "are you sure you want to exchange" in message.content.lower():
-            logger.info("A Shard Buy Message Received")
-            if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
-                await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
-                await message.components[0].children[0].click()  # Clicking The Confirm Button
-            logger.info("Shard Bought")
-        
-        if "you don't have enough shards" in message.content.lower():
-            logger.info("Not Enough Shards To Buy Incense")
-            await message.channel.send("Not Enough Shards To Buy Incense")
-            await message.channel.send(f"To Buy Shards Use `{bot.command_prefix}shardbuy <amount>`")
+            # ========================================== SHARDS HANDLING ========================================== #
+            if "are you sure you want to exchange" in message.content.lower():
+                logger.info("A Shard Buy Message Received")
+                if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
+                    await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
+                    await message.components[0].children[0].click()  # Clicking The Confirm Button
+                logger.info("Shard Bought")
+            
+            if "you don't have enough shards" in message.content.lower():
+                logger.info("Not Enough Shards To Buy Incense")
+                await message.channel.send("Not Enough Shards To Buy Incense")
+                await message.channel.send(f"To Buy Shards Use `{bot.command_prefix}shardbuy <amount>`")
 
-        # ========================================== SPAWN HANDLING ========================================== #
-        incense = None
-        remaining_spawns = ""
-        spawn_interval = ""
-        time_left = ""
+            # ========================================== SPAWN HANDLING ========================================== #
+            incense = None
+            remaining_spawns = ""
+            spawn_interval = ""
+            time_left = ""
 
-        if message.embeds:
-            if message.channel.id in bot.whitelisted_channels and message.embeds[0].title and "wild" in message.embeds[0].title.lower() and bot.verified:  # Checking If Pokémon Spawned And Bot Is Verified
-                logger.info("A Pokémon Spawned - Attempting To Predict")
-                footer = message.embeds[0].footer.text.split("\n") if message.embeds[0].footer.text else []
-                if len(footer) >= 4:
-                    incense = footer[0].strip()
-                    remaining_spawns = footer[1].strip()
-                    spawn_interval = footer[2].strip()
-                    time_left = footer[3].split("at")[0].strip()
+            if message.embeds:
+                if message.channel.id in bot.whitelisted_channels and message.embeds[0].title and "wild" in message.embeds[0].title.lower() and bot.verified:  # Checking If Pokémon Spawned And Bot Is Verified
+                    logger.info("A Pokémon Spawned - Attempting To Predict")
+                    footer = message.embeds[0].footer.text.split("\n") if message.embeds[0].footer.text else []
+                    if len(footer) >= 4:
+                        incense = footer[0].strip()
+                        remaining_spawns = footer[1].strip()
+                        spawn_interval = footer[2].strip()
+                        time_left = footer[3].split("at")[0].strip()
 
-                pokemon_image = message.embeds[0].image.url  # Get The Image URL Of The Pokémon
-                predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict The Pokémon Using Pokefier
-                predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])  # Get The Pokémon With Highest Score
-                name = predicted_pokemon[0]  # Get The Name Of The Pokémon
-                score = predicted_pokemon[1]  # Get The Score Of The Pokémon
+                    pokemon_image = message.embeds[0].image.url  # Get The Image URL Of The Pokémon
+                    predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict The Pokémon Using Pokefier
+                    predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])  # Get The Pokémon With Highest Score
+                    name = predicted_pokemon[0]  # Get The Name Of The Pokémon
+                    score = predicted_pokemon[1]  # Get The Score Of The Pokémon
 
-                bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]  # Get The Blacklisted Pokemons
-                if name.lower() in bot.blacklisted_pokemons:
-                    logger.info(f"Pokémon : {name} Was Not Caught Because It Is Blacklisted")
-                    return
+                    bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]  # Get The Blacklisted Pokemons
+                    if name.lower() in bot.blacklisted_pokemons:
+                        logger.info(f"Pokémon : {name} Was Not Caught Because It Is Blacklisted")
+                        return
 
-                if score > 30.0:  # 30 Is The Threshold Score
-                    alt_name = await bot.get_alternate_pokemon_name(name, languages=bot.languages)
-                    alt_name = remove_diacritics(alt_name)
-                    await asyncio.sleep(random.choice(DELAY))  # Delay Before Catching Pokémon For Human Replication
-                    await message.channel.send(f"<@716390085896962058> c {alt_name}")
-                    logger.info(f"Predicted Pokémon : {name} With Score : {score}")
+                    if score > 30.0:  # 30 Is The Threshold Score
+                        alt_name = await bot.get_alternate_pokemon_name(name, languages=bot.languages)
+                        alt_name = remove_diacritics(alt_name)
+                        await asyncio.sleep(random.choice(DELAY))  # Delay Before Catching Pokémon For Human Replication
+                        await message.channel.send(f"<@716390085896962058> c {alt_name}")
+                        logger.info(f"Predicted Pokémon : {name} With Score : {score}")
 
-                else:
-                    logger.info(f"Predicted Pokémon : {name} With Score : {score}")
-                    await message.channel.send("<@716390085896962058> h")
-                    logger.info("Requested Hint For Pokémon")
+                    else:
+                        logger.info(f"Predicted Pokémon : {name} With Score : {score}")
+                        await message.channel.send("<@716390085896962058> h")
+                        logger.info("Requested Hint For Pokémon")
 
-        if "that is the wrong pokémon" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
-            logger.info("Wrong Pokémon Detected")
-            await message.channel.send("<@716390085896962058> h")
-            logger.info("Requested Hint For Wrong Pokémon")
+            if "that is the wrong pokémon" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
+                logger.info("Wrong Pokémon Detected")
+                await message.channel.send("<@716390085896962058> h")
+                logger.info("Requested Hint For Wrong Pokémon")
 
-        if "the pokémon is" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
-            logger.info("Solving The Hint")
-            hint = solve(message.content)
-            await asyncio.sleep(random.choice(DELAY))  # Delay Before Catching Pokémon For Human Replication
-            await message.channel.send(f"<@716390085896962058> c {hint[0]}")
-            logger.info("Hint Solved")
+            if "the pokémon is" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
+                logger.info("Solving The Hint")
+                hint = solve(message.content)
+                await asyncio.sleep(random.choice(DELAY))  # Delay Before Catching Pokémon For Human Replication
+                await message.channel.send(f"<@716390085896962058> c {hint[0]}")
+                logger.info("Hint Solved")
 
-        # ========================================== CATCH LOG HANDLING ========================================== #
-        if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
-            bot.pokemons_caught += 1
-            is_shiny = "these colors" in message.content.lower()
-            pokemon_data = extract_pokemon_data(message.content)
-            pokemon = next((p for p in bot.pokemon_data if p["name"].lower() == pokemon_data["name"].lower()), None)
+            # ========================================== CATCH LOG HANDLING ========================================== #
+            if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
+                bot.pokemons_caught += 1
+                is_shiny = "these colors" in message.content.lower()
+                pokemon_data = extract_pokemon_data(message.content)
+                pokemon = next((p for p in bot.pokemon_data if p["name"].lower() == pokemon_data["name"].lower()), None)
 
-            embed1 = DiscordEmbed(title="A Pokemon Was Caught!", color="03b2f8")
-            embed1.set_description(f"Account Name : {bot.user.name}\n\nPokémon Name : {pokemon_data['name']}\n\nPokémon Level : {pokemon_data['level']}\nPokémon IV : {pokemon_data['IV']}%\n\nShiny : {is_shiny}\nRarity : {pokemon['rarity']}")
-            embed1.set_author(name="Pokefier", url="https://github.com/sayaarcodes/pokefier", icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png")
-            embed1.set_thumbnail(url=pokemon["image"]["url"])
-            embed1.set_timestamp()
+                embed1 = DiscordEmbed(title="A Pokemon Was Caught!", color="03b2f8")
+                embed1.set_description(f"Account Name : {bot.user.name}\n\nPokémon Name : {pokemon_data['name']}\n\nPokémon Level : {pokemon_data['level']}\nPokémon IV : {pokemon_data['IV']}%\n\nShiny : {is_shiny}\nRarity : {pokemon['rarity']}")
+                embed1.set_author(name="Pokefier", url="https://github.com/sayaarcodes/pokefier", icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png")
+                embed1.set_thumbnail(url=pokemon["image"]["url"])
+                embed1.set_timestamp()
 
-            if incense and incense.lower() == "incense: active.":
-                embed2 = DiscordEmbed(title="Incense Details", color="03b2f8")
-                embed2.set_description(f"Remaining Spawns : {remaining_spawns}\nSpawn Interval : {spawn_interval}\nTime Left : {time_left}")
-                embed2.set_author(name="Pokefier", url="https://github.com/sayaarcodes/pokefier", icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png")
-                embed2.set_thumbnail(url=pokemon["image"]["url"])
-                embed2.set_timestamp()
-                send_log(embed=embed2, WEBHOOK_URL=WEBHOOK_URL)
+                if incense and incense.lower() == "incense: active.":
+                    embed2 = DiscordEmbed(title="Incense Details", color="03b2f8")
+                    embed2.set_description(f"Remaining Spawns : {remaining_spawns}\nSpawn Interval : {spawn_interval}\nTime Left : {time_left}")
+                    embed2.set_author(name="Pokefier", url="https://github.com/sayaarcodes/pokefier", icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png")
+                    embed2.set_thumbnail(url=pokemon["image"]["url"])
+                    embed2.set_timestamp()
+                    send_log(embed=embed2, WEBHOOK_URL=WEBHOOK_URL)
 
-            send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
+                send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
 
-        # ========================================== CAPTCHA HANDLING ========================================== #
-        if f"https://verify.poketwo.net/captcha/{bot.user.id}" in message.content and bot.verified:
-            logger.info("A Captcha Challenge Was Received")
-            bot.verified = False
-            await message.channel.send("<@716390085896962058> incense pause")
-            logger.info("Incense Paused")
-            owner_dm = await bot.fetch_user(OWNER_ID)
-            await owner_dm.send(f"Captcha Challenge Received. Please Solve It.\n\n{message.content}")
-            logger.info("Captcha Challenge Sent To Owner")
+            # ========================================== CAPTCHA HANDLING ========================================== #
+            if f"https://verify.poketwo.net/captcha/{bot.user.id}" in message.content and bot.verified:
+                logger.info("A Captcha Challenge Was Received")
+                bot.verified = False
+                await message.channel.send("<@716390085896962058> incense pause")
+                logger.info("Incense Paused")
+                owner_dm = await bot.fetch_user(OWNER_ID)
+                await owner_dm.send(f"Captcha Challenge Received. Please Solve It.\n\n{message.content}")
+                logger.info("Captcha Challenge Sent To Owner")
 
     await bot.start(token)
 
