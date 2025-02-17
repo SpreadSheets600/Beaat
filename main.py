@@ -24,14 +24,11 @@ pokefier = Pokefier()
 
 # ========================================== LOGGING ========================================= #
 
-# Defining The Basic logger.info Message For logging
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-
-# Defining The Logger
 logger = logging.getLogger(__name__)
 
 # Defining The Log Message Function
@@ -51,11 +48,9 @@ logger.info("Initialized Logging")
 
 # ========================================== CONFIG ========================================== #
 
-# Reading The Config File
 config = read_config()
 logger.info("Initialized Config")
 
-# Defining The Config Variables
 DELAY = config["DELAY"]
 TOKENS = config["TOKENS"]
 LOGGING = config["LOGGING"]
@@ -116,7 +111,6 @@ async def run_autocatcher(token):
         logger.info("+ ====================================== +")
         bot.started = time.time()  # Stats The Time
         bot.command_prefix = f"<@{bot.user.id}> "  # Set Command Prefix
-
         logger.info(f"+ Bot Prefix: {bot.command_prefix}")
 
         bot.verified = True  # Set Verified ( If False Bot Will Not Catch Pokemon)
@@ -134,30 +128,29 @@ async def run_autocatcher(token):
     async def help(ctx):
         if ctx.author.id == OWNER_ID:
             message = (
-                """
-            "**Commands**\n"
-            "shard - Buy Shards\n"
-            "help - View This Message\n"
-            "incense - Start The Incense\n"
-            "say - Make The Bot Say Something\n"
-            "ping - Check If The Bot Is Online\n"
-            "trade - Request A Trade With A User\n"
-            "config - View The Current Configuration\n"
-            "solved - Confirm That The Captcha Was Solved\n"
-            "channeladd - Add A Channel To The Whitelist\n"
-            "channelremove - Remove A Channel From The Whitelist\n"
-            "blacklistadd - Add A Pokémon To The Blacklist\n"
-            "blacklistremove - Remove A Pokémon From The Blacklist\n"
-            "languageadd - Add A Language To The Language List\n"
-            "languageremove - Remove A Language From The Language List"
-          """  )
+            """
+            **Commands**\n
+            `shard` - Buy Shards\n
+            `help` - View This Message\n
+            `incense` - Start The Incense\n
+            `say` - Make The Bot Say Something\n
+            `ping` - Check If The Bot Is Online\n
+            `trade` - Request A Trade With A User\n
+            `config` - View The Current Configuration\n
+            `solved` - Confirm That The Captcha Was Solved\n
+            `channeladd` - Add A Channel To The Whitelist\n
+            `channelremove` - Remove A Channel From The Whitelist\n
+            `blacklistadd` - Add A Pokémon To The Blacklist\n
+            `blacklistremove` - Remove A Pokémon From The Blacklist\n
+            `languageadd` - Add A Language To The Language List\n
+            `languageremove` - Remove A Language From The Language List
+            """
+            )
             await ctx.send(message)
-
 
     @bot.command()
     async def ping(ctx):
         if ctx.author.id == OWNER_ID:
-            await ctx.send("Pong!")
             await ctx.send(f"Latency : {round(bot.latency * 1000)}ms")
 
     @bot.command()
@@ -336,14 +329,11 @@ async def run_autocatcher(token):
             # Trade Confirmation
             if message.embeds:
                 embed = message.embeds[0]
-
                 if embed.author and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.author.name.lower():
                     logger.info("Trade Confirmation Received")
-
                     if message.components[0].children[0].label.lower() == "confirm":
                         await asyncio.sleep(random.choice(DELAY))
                         await message.components[0].children[0].click()
-
                     logger.info("Trade Completed")
 
             # ========================================== SHARDS HANDLING ========================================== #
@@ -395,7 +385,6 @@ async def run_autocatcher(token):
                         await asyncio.sleep(random.choice(DELAY))  # Delay Before Catching Pokémon For Human Replication
                         await message.channel.send(f"<@716390085896962058> c {alt_name}")
                         logger.info(f"Predicted Pokémon : {name} With Score : {score}")
-
                     else:
                         logger.info(f"Predicted Pokémon : {name} With Score : {score}")
                         await message.channel.send("<@716390085896962058> h")
