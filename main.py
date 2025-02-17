@@ -114,7 +114,7 @@ async def run_autocatcher(token):
         logger.info(f"+ Blacklisted Pokemons: {bot.blacklisted_pokemons}")
         logger.info("+ ====================================== +")
 
-        await bot.load_extension("handler.command")
+        bot.load_extension("handler.command")
         print("Loaded Commands")
 
         bot.started = time.time()  # Stats The Time
@@ -306,7 +306,7 @@ async def run_autocatcher(token):
             if message.embeds:
                 embed = message.embeds[0]
 
-                if embed.description and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.description.strip().lower():
+                if embed.description and "Are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.description.strip():
                     logger.info("Trade Confirmation Received")
 
                     if message.components and message.components[0].children:
