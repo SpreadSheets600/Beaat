@@ -114,110 +114,13 @@ async def run_autocatcher(token):
         logger.info(f"+ Blacklisted Pokemons: {bot.blacklisted_pokemons}")
         logger.info("+ ====================================== +")
 
-        bot.load_extension("handler.command")
-        print("Loaded Commands")
-
-        bot.started = time.time()  # Stats The Time
-        bot.command_prefix = f"<@{bot.user.id}> "  # Set Command Prefix
-
-        logger.info(f"+ Bot Prefix: {bot.command_prefix}")
-
-        bot.verified = True  # Set Verified ( If False Bot Will Not Catch Pokemon)
-        bot.pokemons_caught = 0  # Set Global Pokemon Counter To 0
-
-    # ========================================== SPAM TASKS ========================================== #
-
-    @bot.command()
-    async def ping(ctx):
-        if ctx.author.id == OWNER_ID:
-            await ctx.send("Pong!")
-            await ctx.send(f"Latency : {round(bot.latency * 1000)}ms")
-
-    @bot.command()
-    async def incense(ctx, time: str, inter: str):
-        if ctx.author.id == OWNER_ID:
-            if time in ["30m", "1h", "3h", "1d"] and inter in ["10s", "20s", "30s"]:
-                await ctx.send(f"<@{POKETWO_ID}> incense buy {time} {inter} -y")
-            else:
-                await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}incense <time> <interval>`")
-                await ctx.send("Time : 30m, 1h, 3h, 1d")
-                await ctx.send("Interval : 10s, 20s, 30s")
-
-    @bot.command()
-    async def shardbuy(ctx, amt: int):
-        if ctx.author.id == OWNER_ID:
-            if amt > 0:
-                await ctx.send(f"<@{POKETWO_ID}> buy shards {amt}")
-        else:
-            await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`")
-
-    @bot.command()
-    async def channeladd(ctx, *channel_ids):
-        if ctx.author.id == OWNER_ID:
-            if not channel_ids:
-                await ctx.reply("`You Must Provide Atleast One Channel ID. Separate Multiple IDs With Spaces.`")
-                return
-            message = "```\n"
-            for channel_id_str in channel_ids:
-                try:
-                    channel_id = int(channel_id_str)
-                except ValueError:
-                    await ctx.reply(f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID.")
-                    continue
-                if channel_id in bot.whitelisted_channels:
-                    message += f"Channel ID : {channel_id} Is Already Whitelisted\n"
-                else:
-                    bot.whitelisted_channels.append(channel_id)
-                    message += f"Channel ID : {channel_id} Whitelisted\n"
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def channelremove(ctx, *channel_ids):
-        if ctx.author.id == OWNER_ID:
-            if not channel_ids:
-                await ctx.reply("`You Must Provide Atleast One Channel ID. Separate Multiple IDs With Spaces.`")
-                return
-            message = "```\n"
-            for channel_id_str in channel_ids:
-                try:
-                    channel_id = int(channel_id_str)
-                except ValueError:
-                    await ctx.reply(f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID.")
-                    continue
-                if channel_id in bot.whitelisted_channels:
-                    bot.whitelisted_channels = [ch_id for ch_id in bot.whitelisted_channels if ch_id != channel_id]
-                    message += f"Channel ID : {channel_id} Removed From Whitelist\n"
-                else:
-                    message += f"Channel ID : {channel_id} Is Not Whitelisted\n"
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def languageadd(ctx, *languages):
-        if ctx.author.id == OWNER_ID:
-            if not languages:
-                await ctx.reply("`You Must Provide Atleast One Language. Separate Multiple Languages With Spaces.`")
-                return
-            message = "```\n"
-            valid_languages = ["english", "french", "german", "japanese"]
-            for language in languages:
-                if language.lower() not in valid_languages:
-                    await ctx.reply(f"Invalid Language : `{language}`. Please Provide A Valid Language Used By Poketwo.")
-                    continue
-                if language.lower() in bot.languages:
-                    message += f"Language : {language} Is Already Added\n"
-                else:
-                    bot.languages.append(language.lower())
-                    message += f"Language : {language} Added\n"
-            message += "```"
-            await ctx.send(message)
+        await bot.load)
 
     @bot.command()
     async def languageremove(ctx, *languages):
         if ctx.author.id == OWNER_ID:
             if not languages:
-                await ctx.reply("`You Must Provide Atleast One Language. Separate Multiple Languages With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`")
                 return
             message = "```\n"
             valid_languages = ["english", "french", "german", "japanese"]
@@ -237,7 +140,7 @@ async def run_autocatcher(token):
     async def blacklistadd(ctx, *pokemons):
         if ctx.author.id == OWNER_ID:
             if not pokemons:
-                await ctx.reply("`You Must Provide Atleast One Pokemon. Separate Multiple Pokemons With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
                 return
             message = "```\n"
             bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
@@ -254,7 +157,7 @@ async def run_autocatcher(token):
     async def blacklistremove(ctx, *pokemons):
         if ctx.author.id == OWNER_ID:
             if not pokemons:
-                await ctx.reply("`You Must Provide Atleast One Pokemon. Separate Multiple Pokemons With Spaces.`")
+                await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
                 return
             message = "```\n"
             bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
@@ -297,35 +200,32 @@ async def run_autocatcher(token):
             # Trade Accept
             if "requesting a trade with" in message.content.lower():
                 logger.info("Trade Request Received")
-                if message.components[0].children[0].label.lower() == "accept":  # Checking If Accept Button Is Present
+                if message.components and message.components[0].children and message.components[0].children[0].label.lower() == "accept":
                     await asyncio.sleep(random.choice(DELAY))  # Delay Before Accepting Trade For Human Replication
                     await message.components[0].children[0].click()  # Clicking The Accept Button
                 logger.info("Trade Accepted")
 
             # Trade Confirmation
-            if message.embeds:
+            if message.embeds:  # If there's an embed in the message
                 embed = message.embeds[0]
-
-                if embed.description and "Are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.description.strip():
+                if embed.description and "are you sure you want to confirm this trade?" in embed.description.strip().lower():
                     logger.info("Trade Confirmation Received")
-
                     if message.components and message.components[0].children:
                         confirm_button = message.components[0].children[0]
+                        if confirm_button.label and confirm_button.label.strip().lower() == "confirm":  # Confirm button present
+                            await asyncio.sleep(random.choice(DELAY))  # Delay before confirming trade for human replication
+                            await confirm_button.click()  # Clicking the confirm button
+                            logger.info("Trade Confirmed")
 
-                        if confirm_button.label and confirm_button.label.strip().lower() == "confirm":
-                            time.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
-                            await confirm_button.click()  # Clicking The Confirm Button
-
-                    logger.info("Trade Completed")
-
+            # Additional code for handling shards, spawns, etc.
             # ========================================== SHARDS HANDLING ========================================== #
             if "are you sure you want to exchange" in message.content.lower():
                 logger.info("A Shard Buy Message Received")
-                if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
+                if message.components and message.components[0].children and message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
                     await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
-                    await message.components[0].children[0].click()  # Clicking The Confirm Button
+                    await message.components[0].children[0].click()  # Clicking the confirm button
                 logger.info("Shard Bought")
-            
+
             if "you don't have enough shards" in message.content.lower():
                 logger.info("Not Enough Shards To Buy Incense")
                 await message.channel.send("Not Enough Shards To Buy Incense")
