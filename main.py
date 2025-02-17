@@ -114,13 +114,16 @@ async def run_autocatcher(token):
         logger.info(f"+ Blacklisted Pokemons: {bot.blacklisted_pokemons}")
         logger.info("+ ====================================== +")
 
-        await bot.load_extension("handler.command")
+        bot.load_extension("handler.command")
         print("Loaded Commands")
+
         bot.started = time.time()  # Stats The Time
         bot.command_prefix = f"<@{bot.user.id}> "  # Set Command Prefix
+
         logger.info(f"+ Bot Prefix: {bot.command_prefix}")
-        bot.verified = True  # Set Verified (If False Bot Will Not Catch Pokémon)
-        bot.pokemons_caught = 0  # Set Global Pokémon Counter To 0
+
+        bot.verified = True  # Set Verified ( If False Bot Will Not Catch Pokemon)
+        bot.pokemons_caught = 0  # Set Global Pokemon Counter To 0
 
     # ========================================== SPAM TASKS ========================================== #
 
