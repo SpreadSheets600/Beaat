@@ -340,12 +340,11 @@ async def run_autocatcher(token):
                 if embed.author and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.author.name.lower():
                     logger.info("Trade Confirmation Received")
 
-                    if message.components and message.components[0].children:
-                        confirm_button = message.components[0].children[0]
-
-                        if confirm_button.label and confirm_button.label.strip().lower() == "confirm":
-                            await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
-                            await confirm_button.click()  # Clicking The Confirm Button
+                    if (
+                        message.components[0].children[0].label.lower() == "confirm"
+                    ):
+                        await time.sleep(random.choice(DELAY))
+                        await message.components[0].children[0].click()
 
                     logger.info("Trade Completed")
 
@@ -372,14 +371,14 @@ async def run_autocatcher(token):
             time_left = ""
 
             if message.embeds:
-                if message.channel.id in bot.whitelisted_channels and message.embeds[0].title and "wild" in message.embeds[0].title.lower() and bot.verified:  # Checking If Pokémon Spawned And Bot Is Verified
+                if message.channel.id in bot.whitelisted_channels and message.embeds[0].title and "wild" in message.embeds[0].title.lower() and bot.verified:
                     logger.info("A Pokémon Spawned - Attempting To Predict")
-                    footer = message.embeds[0].footer.text.split("\n") if message.embeds[0].footer.text else []
-                    if len(footer) >= 4:
-                        incense = footer[0].strip()
-                        remaining_spawns = footer[1].strip()
-                        spawn_interval = footer[2].strip()
-                        time_left = footer[3].split("at")[0].strip()
+                    if message.embeds[0].footer.text:
+                        footer = message.embeds[0].footer.text.split("\n")
+                        incense = footer[0]
+                        remaining_spawns = footer[1]
+                        spawn_interval = footer[2]
+                        time_left = footer[3].split("at")[0]
 
                     pokemon_image = message.embeds[0].image.url  # Get The Image URL Of The Pokémon
                     predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict The Pokémon Using Pokefier
@@ -402,7 +401,6 @@ async def run_autocatcher(token):
                     else:
                         logger.info(f"Predicted Pokémon : {name} With Score : {score}")
                         await message.channel.send("<@716390085896962058> h")
-                        logger.info("Requested Hint For Pokémon")
 
             if "that is the wrong pokémon" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
                 logger.info("Wrong Pokémon Detected")
@@ -417,28 +415,48 @@ async def run_autocatcher(token):
                 logger.info("Hint Solved")
 
             # ========================================== CATCH LOG HANDLING ========================================== #
-            incense = False
-            remaining_spawns = ""
-            spawn_interval = ""
-            time_left = ""
-            if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
+            if "congratulations" in message.content.lower() and bot.verified:
                 bot.pokemons_caught += 1
-                is_shiny = "these colors" in message.content.lower()
+
+                is_shiny = False
+                if "these colors" in message.content.lower():
+                    is_shiny = True
+
                 pokemon_data = extract_pokemon_data(message.content)
-                pokemon = next((p for p in bot.pokemon_data if p["name"].lower() == pokemon_data["name"].lower()), None)
+                pokemon = next(
+                    (
+                        p
+                        for p in bot.pokemon_data
+                        if p["name"].lower() == pokemon_data["name"].lower()
+                    ),
+                    None,
+                )
 
                 embed1 = DiscordEmbed(title="A Pokemon Was Caught!", color="03b2f8")
-                embed1.set_description(f"Account Name : {bot.user.name}\n\nPokémon Name : {pokemon_data['name']}\n\nPokémon Level : {pokemon_data['level']}\nPokémon IV : {pokemon_data['IV']}%\n\nShiny : {is_shiny}\nRarity : {pokemon['rarity']}")
-                embed1.set_author(name="Pokefier", url="https://github.com/sayaarcodes/pokefier", icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png")
+                embed1.set_description(
+                    f"Account Name : {bot.user.name}\n\nPokémon Name : {pokemon_data['name']}\n\nPokémon Level : {pokemon_data['level']}\nPokémon IV : {pokemon_data['IV']}%\n\nShiny : {is_shiny}\nRarity : {pokemon['rarity']}\n\nPokémons Caught : {bot.pokemons_caught}"
+                )
+                embed1.set_author(
+                    name="Pokefier",
+                    url="https://github.com/sayaarcodes/pokefier",
+                    icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png",
+                )
                 embed1.set_thumbnail(url=pokemon["image"]["url"])
                 embed1.set_timestamp()
 
-                if incense and incense.lower() == "incense: active.":
+                if incense.lower() == "incense: active.":
                     embed2 = DiscordEmbed(title="Incense Details", color="03b2f8")
-                    embed2.set_description(f"Remaining Spawns : {remaining_spawns}\nSpawn Interval : {spawn_interval}\nTime Left : {time_left}")
-                    embed2.set_author(name="Pokefier", url="https://github.com/sayaarcodes/pokefier", icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png")
+                    embed2.set_description(
+                        f"Remaining Spawns : {remaining_spawns}\nSpawn Interval : {spawn_interval}\nTime Left : {time_left}"
+                    )
+                    embed2.set_author(
+                        name="Pokefier",
+                        url="https://github.com/sayaarcodes/pokefier",
+                        icon_url="https://raw.githubusercontent.com/sayaarcodes/pokefier/main/pokefier.png",
+                    )
                     embed2.set_thumbnail(url=pokemon["image"]["url"])
                     embed2.set_timestamp()
+
                     send_log(embed=embed2, WEBHOOK_URL=WEBHOOK_URL)
 
                 send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
