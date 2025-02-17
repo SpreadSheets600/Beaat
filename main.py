@@ -123,26 +123,31 @@ async def run_autocatcher(token: str) -> None:
             logger.info(f"Trade Request Sent To {user}")
 
     @bot.command()
-    async def help(ctx) -> None:
+    async def help(ctx):
         if ctx.author.id == OWNER_ID:
             message = (
-                """
-                **Commands**\n
-                `shard` - Buy Shards\n
-                `help` - View This Message\n
-                `incense` - Start The Incense\n
-                `say` - Make The Bot Say Something\n
-                `ping` - Check If The Bot Is Online\n
-                `trade` - Request A Trade With A User\n
-                `config` - View The Current Configuration\n
-                `solved` - Confirm That The Captcha Was Solved\n
-                `channeladd` - Add A Channel To The Whitelist\n
-                `channelremove` - Remove A Channel From The Whitelist\n
-                `blacklistadd` - Add A Pokémon To The Blacklist\n
-                `blacklistremove` - Remove A Pokémon From The Blacklist\n
-                `languageadd` - Add A Language To The Language List\n
-                `languageremove` - Remove A Language From The Language List
-                """
+            "```markdown\n"
+            "# Commands\n\n"
+            "## General Commands\n"
+            "- `shard`        - Buy Shards\n"
+            "- `help`         - View This Message\n"
+            "- `incense`      - Start The Incense\n"
+            "- `say`          - Make The Bot Say Something\n"
+            "- `ping`         - Check If The Bot Is Online\n"
+            "## Trade Commands\n"
+            "- `trade`        - Request A Trade With A User\n"
+            "## Configuration Commands\n"
+            "- `config`       - View The Current Configuration\n"
+            "- `solved`       - Confirm That The Captcha Was Solved\n"
+            "- `channeladd`   - Add A Channel To The Whitelist\n"
+            "- `channelremove`- Remove A Channel From The Whitelist\n"
+            "## Blacklist Commands\n"
+            "- `blacklistadd` - Add A Pokémon To The Blacklist\n"
+            "- `blacklistremove` - Remove A Pokémon From The Blacklist\n"
+            "## Language Commands\n"
+            "- `languageadd`  - Add A Language To The Language List\n"
+            "- `languageremove` - Remove A Language From The Language List\n"
+            "```"
             )
             await ctx.send(message)
 
