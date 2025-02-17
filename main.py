@@ -133,25 +133,25 @@ async def run_autocatcher(token):
     @bot.command()
     async def help(ctx):
         if ctx.author.id == OWNER_ID:
-            message = """
-            **Commands**
-            `shard` - To Buy Shards
-            `help` - To View This Message
-            `incense` - To Start The Incense
-            `say` - To Make The Bot Say Something
-            `ping` - To Check If The Bot Is Online
-            `trade` - To Request A Trade With A User
-            `config` - To View The Current Configuration
-            `solved` - To Confirm That The Captcha Was Solved
-            `channeladd` - To Add A Channel To The Whitelist
-            `channelremove` - To Remove A Channel From The Whitelist
-            `blacklistadd` - To Add A Pokemon To The Blacklist
-            `blacklistremove` - To Remove A Pokemon From The Blacklist
-            `languageadd` - To Add A Language To The Language List
-            `languageremove` - To Remove A Language From The Language List
-            """
-            time.sleep(random.choice(DELAY))
+            message = (
+            "**Commands**\n"
+            "`shard` - Buy Shards\n"
+            "`help` - View This Message\n"
+            "`incense` - Start The Incense\n"
+            "`say` - Make The Bot Say Something\n"
+            "`ping` - Check If The Bot Is Online\n"
+            "`trade` - Request A Trade With A User\n"
+            "`config` - View The Current Configuration\n"
+            "`solved` - Confirm That The Captcha Was Solved\n"
+            "`channeladd` - Add A Channel To The Whitelist\n"
+            "`channelremove` - Remove A Channel From The Whitelist\n"
+            "`blacklistadd` - Add A Pokémon To The Blacklist\n"
+            "`blacklistremove` - Remove A Pokémon From The Blacklist\n"
+            "`languageadd` - Add A Language To The Language List\n"
+            "`languageremove` - Remove A Language From The Language List"
+            )
             await ctx.send(message)
+
 
     @bot.command()
     async def ping(ctx):
@@ -296,6 +296,7 @@ async def run_autocatcher(token):
         if ctx.author.id == OWNER_ID:
             bot.verified = True
             await ctx.send("Thanks Dude! I Will Continue The Grind")
+            await ctx.send(f"<@{POKETWO_ID}> incense resume")
             logger.info("Captcha Solved - Self Bot Booted")
 
     @bot.command()
