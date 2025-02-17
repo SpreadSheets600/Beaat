@@ -114,13 +114,13 @@ async def run_autocatcher(token):
         logger.info(f"+ Blacklisted Pokemons: {bot.blacklisted_pokemons}")
         logger.info("+ ====================================== +")
 
-        bot.load_extension("handler.command")
+        await bot.load_extension("handler.command")
         print("Loaded Commands")
         bot.started = time.time()  # Stats The Time
         bot.command_prefix = f"<@{bot.user.id}> "  # Set Command Prefix
         logger.info(f"+ Bot Prefix: {bot.command_prefix}")
-        bot.verified = True  # Set Verified (If False Bot Will Not Catch Pokemon)
-        bot.pokemons_caught = 0  # Set Global Pokemon Counter To 0
+        bot.verified = True  # Set Verified (If False Bot Will Not Catch Pokémon)
+        bot.pokemons_caught = 0  # Set Global Pokémon Counter To 0
 
     # ========================================== SPAM TASKS ========================================== #
 
@@ -300,7 +300,7 @@ async def run_autocatcher(token):
                 logger.info("Trade Accepted")
 
             # Trade Confirmation
-            if message.embeds:
+            if message.embeds and message.embeds[0].description:
                 if "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in message.embeds[0].description.lower():
                     logger.info("Trade Confirmation Received")
                     if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
