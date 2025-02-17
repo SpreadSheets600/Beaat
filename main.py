@@ -303,24 +303,20 @@ async def run_autocatcher(token):
                 logger.info("Trade Accepted")
 
             # Trade Confirmation
-            if message.embeds and message.embeds[0].description:
-                if (
-                    "are you sure you want to confirm this trade? Please make sure that you are trading what you intended to."
-                    in message.embeds[0].description.lower()
-                ):
-                    logger.info("Trade Confirmation Received")
+            if message.embeds:
+    embed = message.embeds[0]
 
-                    if (
-                        message.components[0].children[0].label.lower() == "confirm"
-                    ):  # Checking If Confirm Button Is Present
-                        time.sleep(
-                            random.choice(DELAY)
-                        )  # Delay Before Confirming Trade For Human Replication
-                        await (
-                            message.components[0].children[0].click()
-                        )  # Clicking The Confirm Button
+    if embed.description and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.description.strip().lower():
+        logger.info("Trade Confirmation Received")
 
-                    logger.info("Trade Completed")
+        if message.components and message.components[0].children:
+            confirm_button = message.components[0].children[0]
+
+            if confirm_button.label and confirm_button.label.strip().lower() == "confirm":
+                time.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
+                await confirm_button.click()  # Clicking The Confirm Button
+
+        logger.info("Trade Completed")
 
         # ========================================== SHARDS HANDLING ========================================== #
         if "are you sure you want to exchange" in message.content.lower():
