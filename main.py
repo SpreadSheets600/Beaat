@@ -3,6 +3,7 @@ import time
 import random
 import asyncio
 import logging
+from typing import List, Optional
 
 # Discord Modules
 from discord.ext import commands
@@ -31,8 +32,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Defining The Log Message Function
-def log_message(level, message):
+def log_message(level: str, message: str) -> None:
     if level == "info":
         logger.info(message)
     elif level == "warning":
@@ -66,7 +66,7 @@ WHITELISTED_CHANNELS = config["WHITELISTED_CHANNELS"]
 
 # ========================================== SPAM ========================================== #
 
-def spam():
+def spam() -> str:
     with open("Messages/Messages.txt", "r", encoding="utf-8", errors="ignore") as file:
         messages = file.readlines()
     return random.choice(messages).strip()
@@ -74,16 +74,16 @@ def spam():
 # ========================================== AUTOCATCHER CLASS ========================================== #
 
 class Autocatcher(commands.Bot):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(command_prefix=None, self_bot=False)
         self.spam_id = SPAM_ID
         self.interval = INTERVAL
-        self.languages = LANGUAGES
+        self.languages: List[str] = LANGUAGES
         self.pokemon_data = load_pokemon_data()
-        self.whitelisted_channels = WHITELISTED_CHANNELS
-        self.blacklisted_pokemons = BLACKLISTED_POKEMONS
+        self.whitelisted_channels: List[int] = WHITELISTED_CHANNELS
+        self.blacklisted_pokemons: List[str] = BLACKLISTED_POKEMONS
 
-    async def get_alternate_pokemon_name(self, name, languages=LANGUAGES):
+    async def get_alternate_pokemon_name(self, name: str, languages: List[str] = LANGUAGES) -> str:
         pokemon = next((p for p in self.pokemon_data if p["name"].lower() == name.lower()), None)
         if pokemon:
             alternate_names = [
@@ -96,12 +96,12 @@ class Autocatcher(commands.Bot):
 
 # ========================================== MAIN FUNCTIONS ========================================== #
 
-async def run_autocatcher(token):
-    bot = Autocatcher()  # Initialize Bot
+async def run_autocatcher(token: str) -> None:
+    bot = Autocatcher()
     bot.remove_command("help")
 
     @bot.event
-    async def on_ready():
+    async def on_ready() -> None:
         logger.info("+ ============== Pokefier ============== +")
         logger.info(f"+ Logged In : {bot.user} (ID: {bot.user.id})")
         logger.info("+ ============== Config ================ +")
@@ -109,23 +109,21 @@ async def run_autocatcher(token):
         logger.info(f"+ Whitelisted Channels: {bot.whitelisted_channels}")
         logger.info(f"+ Blacklisted Pokemons: {bot.blacklisted_pokemons}")
         logger.info("+ ====================================== +")
-        bot.started = time.time()  # Stats The Time
-        bot.command_prefix = f"<@{bot.user.id}> "  # Set Command Prefix
+        bot.started = time.time()
+        bot.command_prefix = f"<@{bot.user.id}> "
         logger.info(f"+ Bot Prefix: {bot.command_prefix}")
 
-        bot.verified = True  # Set Verified ( If False Bot Will Not Catch Pokemon)
-        bot.pokemons_caught = 0  # Set Global Pokemon Counter To 0
-
-    # ========================================== SPAM TASKS ========================================== #
+        bot.verified = True
+        bot.pokemons_caught = 0
 
     @bot.command()
-    async def trade(ctx, user: str):
+    async def trade(ctx, user: str) -> None:
         if ctx.author.id == OWNER_ID:
             await ctx.send(f"<@{POKETWO_ID}> trade {user}")
             logger.info(f"Trade Request Sent To {user}")
 
     @bot.command()
-    async def help(ctx):
+    async def help(ctx) -> None:
         if ctx.author.id == OWNER_ID:
             message = (
                 """
@@ -149,12 +147,12 @@ async def run_autocatcher(token):
             await ctx.send(message)
 
     @bot.command()
-    async def ping(ctx):
+    async def ping(ctx) -> None:
         if ctx.author.id == OWNER_ID:
             await ctx.send(f"Latency : {round(bot.latency * 1000)}ms")
 
     @bot.command()
-    async def incense(ctx, time: str, inter: str):
+    async def incense(ctx, time: str, inter: str) -> None:
         if ctx.author.id == OWNER_ID:
             if time in ["30m", "1h", "3h", "1d"] and inter in ["10s", "20s", "30s"]:
                 await ctx.send(f"<@{POKETWO_ID}> incense buy {time} {inter} -y")
@@ -164,7 +162,7 @@ async def run_autocatcher(token):
                 await ctx.send("Interval : 10s, 20s, 30s")
 
     @bot.command()
-    async def shardbuy(ctx, amt: int):
+    async def shardbuy(ctx, amt: int) -> None:
         if ctx.author.id == OWNER_ID:
             if amt > 0:
                 await ctx.send(f"<@{POKETWO_ID}> buy shards {amt}")
@@ -172,7 +170,7 @@ async def run_autocatcher(token):
                 await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`")
 
     @bot.command()
-    async def channeladd(ctx, *channel_ids):
+    async def channeladd(ctx, *channel_ids: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not channel_ids:
                 await ctx.reply("`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`")
@@ -192,7 +190,7 @@ async def run_autocatcher(token):
             await ctx.send(message)
 
     @bot.command()
-    async def channelremove(ctx, *channel_ids):
+    async def channelremove(ctx, *channel_ids: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not channel_ids:
                 await ctx.reply("`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`")
@@ -212,7 +210,7 @@ async def run_autocatcher(token):
             await ctx.send(message)
 
     @bot.command()
-    async def languageadd(ctx, *languages):
+    async def languageadd(ctx, *languages: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not languages:
                 await ctx.reply("`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`")
@@ -232,7 +230,7 @@ async def run_autocatcher(token):
             await ctx.send(message)
 
     @bot.command()
-    async def languageremove(ctx, *languages):
+    async def languageremove(ctx, *languages: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not languages:
                 await ctx.reply("`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`")
@@ -252,7 +250,7 @@ async def run_autocatcher(token):
             await ctx.send(message)
 
     @bot.command()
-    async def blacklistadd(ctx, *pokemons):
+    async def blacklistadd(ctx, *pokemons: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not pokemons:
                 await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
@@ -269,7 +267,7 @@ async def run_autocatcher(token):
             await ctx.send(message)
 
     @bot.command()
-    async def blacklistremove(ctx, *pokemons):
+    async def blacklistremove(ctx, *pokemons: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not pokemons:
                 await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
@@ -286,7 +284,7 @@ async def run_autocatcher(token):
             await ctx.send(message)
 
     @bot.command()
-    async def solved(ctx):
+    async def solved(ctx) -> None:
         if ctx.author.id == OWNER_ID:
             bot.verified = True
             await ctx.send("Thanks Dude! I Will Continue The Grind")
@@ -294,13 +292,13 @@ async def run_autocatcher(token):
             logger.info("Captcha Solved - Self Bot Booted")
 
     @bot.command()
-    async def config(ctx):
+    async def config(ctx) -> None:
         if ctx.author.id == OWNER_ID:
             message = f"```PREFIX: {bot.command_prefix}\nOWNER_ID: {OWNER_ID}\n\nWHITELISTED_CHANNELS = {bot.whitelisted_channels}\nBLACKLISTED_POKEMONS={bot.blacklisted_pokemons}\n\nLANGUAGES = {bot.languages}```"
             await ctx.reply(message)
 
     @bot.command()
-    async def say(ctx, *, message):
+    async def say(ctx, *, message: str) -> None:
         if ctx.message.author.id == OWNER_ID:
             if "p2" in message.lower():
                 message = message.replace("p2", f"<@{POKETWO_ID}>")
@@ -309,42 +307,38 @@ async def run_autocatcher(token):
                 await ctx.send(message)
 
     @bot.event
-    async def on_message(message):
+    async def on_message(message) -> None:
         await bot.process_commands(message)
 
-        # ========================================== TRADE HANDLING ========================================== #
         if message.author.id == POKETWO_ID and message.channel.id in bot.whitelisted_channels:
             logger.info("Message Received From POKETWO")
             logger.info("Attempting To Process Message")
 
-            # Trade Accept
             if "requesting a trade with" in message.content.lower():
                 logger.info("Trade Request Received")
                 try:
-                    if message.components[0].children[0].label.lower() == "accept":  # Checking If Accept Button Is Present
-                        await asyncio.sleep(random.choice(DELAY))  # Delay Before Accepting Trade For Human Replication
-                        await message.components[0].children[0].click()  # Clicking The Accept Button
+                    if message.components[0].children[0].label.lower() == "accept":
+                        time.sleep(random.choice(DELAY))
+                        await message.components[0].children[0].click()
                     logger.info("Trade Accepted")
                 except Exception as e:
                     logger.error(f"Error in trade acceptance: {e}")
 
-            # Trade Confirmation
             if message.embeds:
                 embed = message.embeds[0]
                 if embed.author and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.author.name.lower():
                     logger.info("Trade Confirmation Received")
                     if message.components[0].children[0].label.lower() == "confirm":
-                        await asyncio.sleep(random.choice(DELAY))
+                        time.sleep(random.choice(DELAY))
                         await message.components[0].children[0].click()
                     logger.info("Trade Completed")
 
-            # ========================================== SHARDS HANDLING ========================================== #
             if "are you sure you want to exchange" in message.content.lower():
                 logger.info("A Shard Buy Message Received")
                 try:
-                    if message.components[0].children[0].label.lower() == "confirm":  # Checking If Confirm Button Is Present
-                        await asyncio.sleep(random.choice(DELAY))  # Delay Before Confirming Trade For Human Replication
-                        await message.components[0].children[0].click()  # Clicking The Confirm Button
+                    if message.components[0].children[0].label.lower() == "confirm":
+                        time.sleep(random.choice(DELAY))
+                        await message.components[0].children[0].click()
                     logger.info("Shard Bought")
                 except Exception as e:
                     logger.error(f"Error in shard buying: {e}")
@@ -370,21 +364,21 @@ async def run_autocatcher(token):
                         spawn_interval = footer[2]
                         time_left = footer[3].split("at")[0]
 
-                    pokemon_image = message.embeds[0].image.url  # Get The Image URL Of The Pokémon
-                    predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict The Pokémon Using Pokefier
-                    predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])  # Get The Pokémon With Highest Score
-                    name = predicted_pokemon[0]  # Get The Name Of The Pokémon
-                    score = predicted_pokemon[1]  # Get The Score Of The Pokémon
+                    pokemon_image = message.embeds[0].image.url
+                    predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict the Pokémon
+                    predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])
+                    name = predicted_pokemon[0]
+                    score = predicted_pokemon[1]
 
-                    bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]  # Get The Blacklisted Pokemons
+                    bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
                     if name.lower() in bot.blacklisted_pokemons:
                         logger.info(f"Pokémon : {name} Was Not Caught Because It Is Blacklisted")
                         return
 
-                    if score > 30.0:  # 30 Is The Threshold Score
+                    if score > 30.0:
                         alt_name = await bot.get_alternate_pokemon_name(name, languages=bot.languages)
                         alt_name = remove_diacritics(alt_name)
-                        await asyncio.sleep(random.choice(DELAY))  # Delay Before Catching Pokémon For Human Replication
+                        time.sleep(random.choice(DELAY))
                         await message.channel.send(f"<@716390085896962058> c {alt_name}")
                         logger.info(f"Predicted Pokémon : {name} With Score : {score}")
                     else:
@@ -399,25 +393,17 @@ async def run_autocatcher(token):
             if "the pokémon is" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
                 logger.info("Solving The Hint")
                 hint = solve(message.content)
-                await asyncio.sleep(random.choice(DELAY))  # Delay Before Catching Pokémon For Human Replication
+                time.sleep(random.choice(DELAY))
                 await message.channel.send(f"<@716390085896962058> c {hint[0]}")
                 logger.info("Hint Solved")
 
-            # ========================================== CATCH LOG HANDLING ========================================== #
-            if "congratulations" in message.content.lower() and bot.verified:
+            if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
                 bot.pokemons_caught += 1
-
-                is_shiny = False
-                if "these colors" in message.content.lower():
-                    is_shiny = True
+                is_shiny = "these colors" in message.content.lower()
 
                 pokemon_data = extract_pokemon_data(message.content)
                 pokemon = next(
-                    (
-                        p
-                        for p in bot.pokemon_data
-                        if p["name"].lower() == pokemon_data["name"].lower()
-                    ),
+                    (p for p in bot.pokemon_data if p["name"].lower() == pokemon_data["name"].lower()),
                     None,
                 )
 
@@ -433,7 +419,7 @@ async def run_autocatcher(token):
                 embed1.set_thumbnail(url=pokemon["image"]["url"])
                 embed1.set_timestamp()
 
-                if incense.lower() == "incense: active.":
+                if incense == "Incense: Active.":
                     embed2 = DiscordEmbed(title="Incense Details", color="03b2f8")
                     embed2.set_description(
                         f"Remaining Spawns : {remaining_spawns}\nSpawn Interval : {spawn_interval}\nTime Left : {time_left}"
@@ -450,7 +436,6 @@ async def run_autocatcher(token):
 
                 send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
 
-            # ========================================== CAPTCHA HANDLING ========================================== #
             if f"https://verify.poketwo.net/captcha/{bot.user.id}" in message.content and bot.verified:
                 logger.info("A Captcha Challenge Was Received")
                 bot.verified = False
@@ -462,7 +447,7 @@ async def run_autocatcher(token):
 
     await bot.start(token)
 
-async def main(tokens):
+async def main(tokens: List[str]) -> None:
     ac_tasks = [run_autocatcher(token) for token in tokens]
     await asyncio.gather(*ac_tasks)
 
