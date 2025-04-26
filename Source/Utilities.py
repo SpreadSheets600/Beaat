@@ -3,7 +3,7 @@ import json
 import unicodedata
 from discord_webhook import DiscordWebhook
 
-with open("Source/Pokemon", "r", encoding="utf8") as file:
+with open("source/pokemon", "r", encoding="utf8") as file:
     pokemon_list = file.read()
 
 
@@ -17,7 +17,7 @@ def solve(message):
     return re.findall("^" + hint_replaced + "$", pokemon_list, re.MULTILINE)
 
 
-def read_config(filename="Source/Config.json"):
+def read_config(filename="source/config.json"):
     with open(filename, "r") as f:
         return json.load(f)
 
@@ -46,7 +46,7 @@ def extract_pokemon_data(text):
 
 
 def load_pokemon_data():
-    with open("Source/Data.json", "r", encoding="utf-8") as f:
+    with open("source/data.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
 
