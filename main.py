@@ -1,17 +1,23 @@
 # System Modules
+import sys
 import time
 import random
 import asyncio
 import logging
 from typing import List, Optional
+import concurrent.futures
+
+# Configure event loop policy for Windows compatibility
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # Discord Modules
 from discord.ext import commands
 from discord_webhook import DiscordEmbed
 
 # Pokefire Modules
-from Source.PKIdentify import Pokefier
-from Source.Utilities import (
+from source.identify import Pokefier
+from source.utilities import (
     extract_pokemon_data,
     load_pokemon_data,
     remove_diacritics,
@@ -19,9 +25,7 @@ from Source.Utilities import (
     send_log,
     solve,
 )
-
-# Initialize Pokefier Instance
-pokefier = Pokefier()
+from source.messages import *
 
 # ========================================== LOGGING ========================================= #
 
@@ -31,6 +35,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
 
 def log_message(level: str, message: str) -> None:
     if level == "info":
@@ -43,6 +48,7 @@ def log_message(level: str, message: str) -> None:
         logger.debug(message)
     else:
         logger.info(message)
+
 
 logger.info("Initialized Logging")
 
@@ -64,14 +70,22 @@ WEBHOOK_URL = config["WEBHOOK_URL"]
 BLACKLISTED_POKEMONS = config["BLACKLISTED_POKEMONS"]
 WHITELISTED_CHANNELS = config["WHITELISTED_CHANNELS"]
 
+pokefier = Pokefier(num_interpreters=max(8, len(config["TOKENS"]) * 2))
+BOT_THREAD_POOL = concurrent.futures.ThreadPoolExecutor(
+    max_workers=max(10, len(config["TOKENS"]) * 3)
+)
+
 # ========================================== SPAM ========================================== #
 
+
 def spam() -> str:
-    with open("Messages/Messages.txt", "r", encoding="utf-8", errors="ignore") as file:
+    with open("messages/messages.txt", "r", encoding="utf-8", errors="ignore") as file:
         messages = file.readlines()
     return random.choice(messages).strip()
 
+
 # ========================================== AUTOCATCHER CLASS ========================================== #
+
 
 class Autocatcher(commands.Bot):
     def __init__(self) -> None:
@@ -83,18 +97,25 @@ class Autocatcher(commands.Bot):
         self.whitelisted_channels: List[int] = WHITELISTED_CHANNELS
         self.blacklisted_pokemons: List[str] = BLACKLISTED_POKEMONS
 
-    async def get_alternate_pokemon_name(self, name: str, languages: List[str] = LANGUAGES) -> str:
-        pokemon = next((p for p in self.pokemon_data if p["name"].lower() == name.lower()), None)
+    async def get_alternate_pokemon_name(
+        self, name: str, languages: List[str] = LANGUAGES
+    ) -> str:
+        pokemon = next(
+            (p for p in self.pokemon_data if p["name"].lower() == name.lower()), None
+        )
         if pokemon:
             alternate_names = [
-                alt_name for alt_name in pokemon.get("altnames", [])
+                alt_name
+                for alt_name in pokemon.get("altnames", [])
                 if alt_name.get("language").lower() in languages
             ]
             if alternate_names:
                 return random.choice(alternate_names)["name"].lower()
         return name.lower()
 
+
 # ========================================== MAIN FUNCTIONS ========================================== #
+
 
 async def run_autocatcher(token: str) -> None:
     bot = Autocatcher()
@@ -126,23 +147,23 @@ async def run_autocatcher(token: str) -> None:
     async def help(ctx):
         if ctx.author.id == OWNER_ID:
             message = (
-            "```\n"
-            "Commands:\n\n"
-            "shard - Buy Shards\n\n"
-            "help - View This Message\n\n"
-            "incense - Start The Incense\n\n"
-            "say - Make The Bot Say Something\n\n"
-            "ping - Check If The Bot Is Online\n\n"
-            "trade - Request A Trade With A User\n\n"
-            "config - View The Current Configuration\n\n"
-            "solved - Confirm That The Captcha Was Solved\n\n"
-            "channeladd - Add A Channel To The Whitelist\n\n"
-            "channelremove - Remove A Channel From The Whitelist\n\n"
-            "blacklistadd - Add A Pokémon To The Blacklist\n\n"
-            "blacklistremove - Remove A Pokémon From The Blacklist\n\n"
-            "languageadd - Add A Language To The Language List\n\n"
-            "languageremove - Remove A Language From The Language List\n"
-            "```"
+                "```\n"
+                "Commands:\n\n"
+                "shard - Buy Shards\n\n"
+                "help - View This Message\n\n"
+                "incense - Start The Incense\n\n"
+                "say - Make The Bot Say Something\n\n"
+                "ping - Check If The Bot Is Online\n\n"
+                "trade - Request A Trade With A User\n\n"
+                "config - View The Current Configuration\n\n"
+                "solved - Confirm That The Captcha Was Solved\n\n"
+                "channeladd - Add A Channel To The Whitelist\n\n"
+                "channelremove - Remove A Channel From The Whitelist\n\n"
+                "blacklistadd - Add A Pokémon To The Blacklist\n\n"
+                "blacklistremove - Remove A Pokémon From The Blacklist\n\n"
+                "languageadd - Add A Language To The Language List\n\n"
+                "languageremove - Remove A Language From The Language List\n"
+                "```"
             )
             await ctx.send(message)
 
@@ -157,7 +178,9 @@ async def run_autocatcher(token: str) -> None:
             if time in ["30m", "1h", "3h", "1d"] and inter in ["10s", "20s", "30s"]:
                 await ctx.send(f"<@{POKETWO_ID}> incense buy {time} {inter} -y")
             else:
-                await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}incense <time> <interval>`")
+                await ctx.send(
+                    f"Invalid Usage. Correct Usage : `{bot.command_prefix}incense <time> <interval>`"
+                )
                 await ctx.send("Time : 30m, 1h, 3h, 1d")
                 await ctx.send("Interval : 10s, 20s, 30s")
 
@@ -167,13 +190,17 @@ async def run_autocatcher(token: str) -> None:
             if amt > 0:
                 await ctx.send(f"<@{POKETWO_ID}> buy shards {amt}")
             else:
-                await ctx.send(f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`")
+                await ctx.send(
+                    f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`"
+                )
 
     @bot.command()
     async def channeladd(ctx, *channel_ids: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not channel_ids:
-                await ctx.reply("`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`")
+                await ctx.reply(
+                    "`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`"
+                )
                 return
             message = "```\n"
             for channel_id_str in channel_ids:
@@ -185,7 +212,9 @@ async def run_autocatcher(token: str) -> None:
                         bot.whitelisted_channels.append(channel_id)
                         message += f"Channel ID : {channel_id} Whitelisted\n"
                 except ValueError:
-                    await ctx.reply(f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID.")
+                    await ctx.reply(
+                        f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID."
+                    )
             message += "```"
             await ctx.send(message)
 
@@ -193,19 +222,27 @@ async def run_autocatcher(token: str) -> None:
     async def channelremove(ctx, *channel_ids: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not channel_ids:
-                await ctx.reply("`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`")
+                await ctx.reply(
+                    "`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`"
+                )
                 return
             message = "```\n"
             for channel_id_str in channel_ids:
                 try:
                     channel_id = int(channel_id_str)
                     if channel_id in bot.whitelisted_channels:
-                        bot.whitelisted_channels = [ch_id for ch_id in bot.whitelisted_channels if ch_id != channel_id]
+                        bot.whitelisted_channels = [
+                            ch_id
+                            for ch_id in bot.whitelisted_channels
+                            if ch_id != channel_id
+                        ]
                         message += f"Channel ID : {channel_id} Removed From Whitelist\n"
                     else:
                         message += f"Channel ID : {channel_id} Is Not Whitelisted\n"
                 except ValueError:
-                    await ctx.reply(f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID.")
+                    await ctx.reply(
+                        f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID."
+                    )
             message += "```"
             await ctx.send(message)
 
@@ -213,13 +250,17 @@ async def run_autocatcher(token: str) -> None:
     async def languageadd(ctx, *languages: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not languages:
-                await ctx.reply("`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`")
+                await ctx.reply(
+                    "`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`"
+                )
                 return
             message = "```\n"
             valid_languages = ["english", "french", "german", "japanese"]
             for language in languages:
                 if language.lower() not in valid_languages:
-                    await ctx.reply(f"Invalid Language : `{language}`. Please Provide A Valid Language Used By Poketwo.")
+                    await ctx.reply(
+                        f"Invalid Language : `{language}`. Please Provide A Valid Language Used By Poketwo."
+                    )
                     continue
                 if language.lower() in bot.languages:
                     message += f"Language : {language} Is Already Added\n"
@@ -233,13 +274,17 @@ async def run_autocatcher(token: str) -> None:
     async def languageremove(ctx, *languages: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not languages:
-                await ctx.reply("`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`")
+                await ctx.reply(
+                    "`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`"
+                )
                 return
             message = "```\n"
             valid_languages = ["english", "french", "german", "japanese"]
             for language in languages:
                 if language.lower() not in valid_languages:
-                    await ctx.reply(f"Invalid Language : `{language}`. Please Provide A Valid Language Used By Poketwo.")
+                    await ctx.reply(
+                        f"Invalid Language : `{language}`. Please Provide A Valid Language Used By Poketwo."
+                    )
                     continue
                 if language.lower() in bot.languages:
                     bot.languages = [lang for lang in bot.languages if lang != language]
@@ -253,10 +298,14 @@ async def run_autocatcher(token: str) -> None:
     async def blacklistadd(ctx, *pokemons: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not pokemons:
-                await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
+                await ctx.reply(
+                    "`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`"
+                )
                 return
             message = "```\n"
-            bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
+            bot.blacklisted_pokemons = [
+                pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons
+            ]
             for pokemon in pokemons:
                 if pokemon.lower() in bot.blacklisted_pokemons:
                     message += f"Pokemon: {pokemon} Is Already Blacklisted\n"
@@ -270,13 +319,19 @@ async def run_autocatcher(token: str) -> None:
     async def blacklistremove(ctx, *pokemons: str) -> None:
         if ctx.author.id == OWNER_ID:
             if not pokemons:
-                await ctx.reply("`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`")
+                await ctx.reply(
+                    "`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`"
+                )
                 return
             message = "```\n"
-            bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
+            bot.blacklisted_pokemons = [
+                pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons
+            ]
             for pokemon in pokemons:
                 if pokemon.lower() in bot.blacklisted_pokemons:
-                    bot.blacklisted_pokemons = [poke for poke in bot.blacklisted_pokemons if poke != pokemon]
+                    bot.blacklisted_pokemons = [
+                        poke for poke in bot.blacklisted_pokemons if poke != pokemon
+                    ]
                     message += f"Pokemon : {pokemon} Removed From Blacklist\n"
                 else:
                     message += f"Pokemon : {pokemon} Is Not Blacklisted\n"
@@ -310,7 +365,10 @@ async def run_autocatcher(token: str) -> None:
     async def on_message(message) -> None:
         await bot.process_commands(message)
 
-        if message.author.id == POKETWO_ID and message.channel.id in bot.whitelisted_channels:
+        if (
+            message.author.id == POKETWO_ID
+            and message.channel.id in bot.whitelisted_channels
+        ):
             logger.info("Message Received From POKETWO")
             logger.info("Attempting To Process Message")
 
@@ -326,7 +384,11 @@ async def run_autocatcher(token: str) -> None:
 
             if message.embeds:
                 embed = message.embeds[0]
-                if embed.author and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to." in embed.author.name.lower():
+                if (
+                    embed.author
+                    and "are you sure you want to confirm this trade? please make sure that you are trading what you intended to."
+                    in embed.author.name.lower()
+                ):
                     logger.info("Trade Confirmation Received")
                     if message.components[0].children[0].label.lower() == "confirm":
                         time.sleep(random.choice(DELAY))
@@ -346,7 +408,9 @@ async def run_autocatcher(token: str) -> None:
             if "you don't have enough shards" in message.content.lower():
                 logger.info("Not Enough Shards To Buy Incense")
                 await message.channel.send("Not Enough Shards To Buy Incense")
-                await message.channel.send(f"To Buy Shards Use `{bot.command_prefix}shardbuy <amount>`")
+                await message.channel.send(
+                    f"To Buy Shards Use `{bot.command_prefix}shardbuy <amount>`"
+                )
 
             # ========================================== SPAWN HANDLING ========================================== #
             incense = ""
@@ -355,7 +419,12 @@ async def run_autocatcher(token: str) -> None:
             time_left = ""
 
             if message.embeds:
-                if message.channel.id in bot.whitelisted_channels and message.embeds[0].title and "wild" in message.embeds[0].title.lower() and bot.verified:
+                if (
+                    message.channel.id in bot.whitelisted_channels
+                    and message.embeds[0].title
+                    and "wild" in message.embeds[0].title.lower()
+                    and bot.verified
+                ):
                     logger.info("A Pokémon Spawned - Attempting To Predict")
                     if message.embeds[0].footer.text:
                         footer = message.embeds[0].footer.text.split("\n")
@@ -365,45 +434,72 @@ async def run_autocatcher(token: str) -> None:
                         time_left = footer[3].split("at")[0]
 
                     pokemon_image = message.embeds[0].image.url
-                    predicted_pokemons = await pokefier.predict_pokemon_from_url(pokemon_image)  # Predict the Pokémon
+                    predicted_pokemons = await pokefier.predict_pokemon_from_url(
+                        pokemon_image
+                    )  # Predict the Pokémon
                     predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])
                     name = predicted_pokemon[0]
                     score = predicted_pokemon[1]
 
-                    bot.blacklisted_pokemons = [pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons]
+                    bot.blacklisted_pokemons = [
+                        pokemon_name.lower()
+                        for pokemon_name in bot.blacklisted_pokemons
+                    ]
                     if name.lower() in bot.blacklisted_pokemons:
-                        logger.info(f"Pokémon : {name} Was Not Caught Because It Is Blacklisted")
+                        logger.info(
+                            f"Pokémon : {name} Was Not Caught Because It Is Blacklisted"
+                        )
                         return
 
                     if score > 30.0:
-                        alt_name = await bot.get_alternate_pokemon_name(name, languages=bot.languages)
+                        alt_name = await bot.get_alternate_pokemon_name(
+                            name, languages=bot.languages
+                        )
                         alt_name = remove_diacritics(alt_name)
                         time.sleep(random.choice(DELAY))
-                        await message.channel.send(f"<@716390085896962058> c {alt_name}")
+                        await message.channel.send(
+                            f"<@716390085896962058> c {alt_name}"
+                        )
                         logger.info(f"Predicted Pokémon : {name} With Score : {score}")
                     else:
                         logger.info(f"Predicted Pokémon : {name} With Score : {score}")
                         await message.channel.send("<@716390085896962058> h")
 
-            if "that is the wrong pokémon" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
+            if (
+                "that is the wrong pokémon" in message.content.lower()
+                and bot.verified
+                and message.channel.id in bot.whitelisted_channels
+            ):
                 logger.info("Wrong Pokémon Detected")
                 await message.channel.send("<@716390085896962058> h")
                 logger.info("Requested Hint For Wrong Pokémon")
 
-            if "the pokémon is" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
+            if (
+                "the pokémon is" in message.content.lower()
+                and bot.verified
+                and message.channel.id in bot.whitelisted_channels
+            ):
                 logger.info("Solving The Hint")
                 hint = solve(message.content)
                 time.sleep(random.choice(DELAY))
                 await message.channel.send(f"<@716390085896962058> c {hint[0]}")
                 logger.info("Hint Solved")
 
-            if "congratulations" in message.content.lower() and bot.verified and message.channel.id in bot.whitelisted_channels:
+            if (
+                "congratulations" in message.content.lower()
+                and bot.verified
+                and message.channel.id in bot.whitelisted_channels
+            ):
                 bot.pokemons_caught += 1
                 is_shiny = "these colors" in message.content.lower()
 
                 pokemon_data = extract_pokemon_data(message.content)
                 pokemon = next(
-                    (p for p in bot.pokemon_data if p["name"].lower() == pokemon_data["name"].lower()),
+                    (
+                        p
+                        for p in bot.pokemon_data
+                        if p["name"].lower() == pokemon_data["name"].lower()
+                    ),
                     None,
                 )
 
@@ -436,20 +532,36 @@ async def run_autocatcher(token: str) -> None:
 
                 send_log(embed=embed1, WEBHOOK_URL=WEBHOOK_URL)
 
-            if f"https://verify.poketwo.net/captcha/{bot.user.id}" in message.content and bot.verified:
+            if (
+                f"https://verify.poketwo.net/captcha/{bot.user.id}" in message.content
+                and bot.verified
+            ):
                 logger.info("A Captcha Challenge Was Received")
                 bot.verified = False
                 await message.channel.send("<@716390085896962058> incense pause")
                 logger.info("Incense Paused")
                 owner_dm = await bot.fetch_user(OWNER_ID)
-                await owner_dm.send(f"Captcha Challenge Received. Please Solve It.\n\n{message.content}")
+                await owner_dm.send(
+                    f"Captcha Challenge Received. Please Solve It.\n\n{message.content}"
+                )
                 logger.info("Captcha Challenge Sent To Owner")
 
     await bot.start(token)
+
 
 async def main(tokens: List[str]) -> None:
     ac_tasks = [run_autocatcher(token) for token in tokens]
     await asyncio.gather(*ac_tasks)
 
+
 if __name__ == "__main__":
-    asyncio.run(main(TOKENS))
+    if sys.platform.startswith("win"):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    try:
+        loop.run_until_complete(main(TOKENS))
+    finally:
+        loop.close()
