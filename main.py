@@ -1,21 +1,19 @@
-# System Modules
 import sys
+from tabnanny import check
 import time
+import json
 import random
 import asyncio
 import logging
-from typing import List, Optional
 import concurrent.futures
+from typing import List, Optional
 
-# Configure event loop policy for Windows compatibility
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-# Discord Modules
 from discord.ext import commands
 from discord_webhook import DiscordEmbed
 
-# Pokefire Modules
 from source.identify import Pokefier
 from source.utilities import (
     extract_pokemon_data,
@@ -50,12 +48,12 @@ def log_message(level: str, message: str) -> None:
         logger.info(message)
 
 
-logger.info("Initialized Logging")
+logger.info("+ Initialized Logging")
 
 # ========================================== CONFIG ========================================== #
 
 config = read_config()
-logger.info("Initialized Config")
+logger.info("+ Initialized Config")
 
 DELAY = config["DELAY"]
 TOKENS = config["TOKENS"]
@@ -71,9 +69,59 @@ BLACKLISTED_POKEMONS = config["BLACKLISTED_POKEMONS"]
 WHITELISTED_CHANNELS = config["WHITELISTED_CHANNELS"]
 
 pokefier = Pokefier(num_interpreters=max(8, len(config["TOKENS"]) * 2))
+
 BOT_THREAD_POOL = concurrent.futures.ThreadPoolExecutor(
     max_workers=max(10, len(config["TOKENS"]) * 3)
 )
+
+
+def load_config():
+    try:
+        with open("source/config.json", "r") as file:
+            config = json.load(file)
+        return config
+    except FileNotFoundError:
+        logger.error("Config File Not Found")
+        return {}
+    except json.JSONDecodeError:
+        logger.error("Error Decoding JSON COnfig File")
+        return {}
+    except Exception as e:
+        logger.error(f"Unexpected Error : {e}")
+        return {}
+
+
+def check_config(key: str):
+    try:
+        with open("source\config.json", "r") as file:
+            config = json.load(file)
+
+        if key in config:
+            return config[key]
+        else:
+            logger.warning(f"Key {key} Not Found In Config.")
+            return None
+
+    except Exception as e:
+        logger.error(f"Error Reading Config: {e}")
+        return None
+
+
+def update_config(key: str, value: str):
+    try:
+        with open("source\config.json", "r") as file:
+            config = json.load(file)
+
+        config[key] = value
+
+        with open("source\config.json", "w") as file:
+            json.dump(config, file, indent=4)
+
+        logger.info(f"Updated config: {key} = {value}")
+
+    except Exception as e:
+        logger.error(f"Error Updating Config: {e}")
+
 
 # ========================================== SPAM ========================================== #
 
@@ -134,232 +182,20 @@ async def run_autocatcher(token: str) -> None:
         bot.command_prefix = f"<@{bot.user.id}> "
         logger.info(f"+ Bot Prefix: {bot.command_prefix}")
 
+        await bot.load_extension("commands.poketwo")
+        logger.info("+ Loaded Poketwo Commands")
+
+        await bot.load_extension("commands.utilities")
+        logger.info("+ Loaded Utilities Commands")
+
+        await bot.load_extension("commands.channel")
+        logger.info("+ Loaded Channel Commands")
+
+        await bot.load_extension("commands.language")
+        logger.info("+ Loaded Language Commands")
+
         bot.verified = True
         bot.pokemons_caught = 0
-
-    @bot.command()
-    async def trade(ctx, user: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            await ctx.send(f"<@{POKETWO_ID}> trade {user}")
-            logger.info(f"Trade Request Sent To {user}")
-
-    @bot.command()
-    async def help(ctx):
-        if ctx.author.id == OWNER_ID:
-            message = (
-                "```\n"
-                "Commands:\n\n"
-                "shard - Buy Shards\n\n"
-                "help - View This Message\n\n"
-                "incense - Start The Incense\n\n"
-                "say - Make The Bot Say Something\n\n"
-                "ping - Check If The Bot Is Online\n\n"
-                "trade - Request A Trade With A User\n\n"
-                "config - View The Current Configuration\n\n"
-                "solved - Confirm That The Captcha Was Solved\n\n"
-                "channeladd - Add A Channel To The Whitelist\n\n"
-                "channelremove - Remove A Channel From The Whitelist\n\n"
-                "blacklistadd - Add A Pokémon To The Blacklist\n\n"
-                "blacklistremove - Remove A Pokémon From The Blacklist\n\n"
-                "languageadd - Add A Language To The Language List\n\n"
-                "languageremove - Remove A Language From The Language List\n"
-                "```"
-            )
-            await ctx.send(message)
-
-    @bot.command()
-    async def ping(ctx) -> None:
-        if ctx.author.id == OWNER_ID:
-            await ctx.send(f"Latency : {round(bot.latency * 1000)}ms")
-
-    @bot.command()
-    async def incense(ctx, time: str, inter: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            if time in ["30m", "1h", "3h", "1d"] and inter in ["10s", "20s", "30s"]:
-                await ctx.send(f"<@{POKETWO_ID}> incense buy {time} {inter} -y")
-            else:
-                await ctx.send(
-                    f"Invalid Usage. Correct Usage : `{bot.command_prefix}incense <time> <interval>`"
-                )
-                await ctx.send("Time : 30m, 1h, 3h, 1d")
-                await ctx.send("Interval : 10s, 20s, 30s")
-
-    @bot.command()
-    async def shardbuy(ctx, amt: int) -> None:
-        if ctx.author.id == OWNER_ID:
-            if amt > 0:
-                await ctx.send(f"<@{POKETWO_ID}> buy shards {amt}")
-            else:
-                await ctx.send(
-                    f"Invalid Usage. Correct Usage : `{bot.command_prefix}shardbuy <amount>`"
-                )
-
-    @bot.command()
-    async def channeladd(ctx, *channel_ids: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            if not channel_ids:
-                await ctx.reply(
-                    "`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`"
-                )
-                return
-            message = "```\n"
-            for channel_id_str in channel_ids:
-                try:
-                    channel_id = int(channel_id_str)
-                    if channel_id in bot.whitelisted_channels:
-                        message += f"Channel ID : {channel_id} Is Already Whitelisted\n"
-                    else:
-                        bot.whitelisted_channels.append(channel_id)
-                        message += f"Channel ID : {channel_id} Whitelisted\n"
-                except ValueError:
-                    await ctx.reply(
-                        f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID."
-                    )
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def channelremove(ctx, *channel_ids: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            if not channel_ids:
-                await ctx.reply(
-                    "`You Must Provide At Least One Channel ID. Separate Multiple IDs With Spaces.`"
-                )
-                return
-            message = "```\n"
-            for channel_id_str in channel_ids:
-                try:
-                    channel_id = int(channel_id_str)
-                    if channel_id in bot.whitelisted_channels:
-                        bot.whitelisted_channels = [
-                            ch_id
-                            for ch_id in bot.whitelisted_channels
-                            if ch_id != channel_id
-                        ]
-                        message += f"Channel ID : {channel_id} Removed From Whitelist\n"
-                    else:
-                        message += f"Channel ID : {channel_id} Is Not Whitelisted\n"
-                except ValueError:
-                    await ctx.reply(
-                        f"Invalid Channel ID : `{channel_id_str}`. Please Provide A Valid Numeric Channel ID."
-                    )
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def languageadd(ctx, *languages: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            if not languages:
-                await ctx.reply(
-                    "`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`"
-                )
-                return
-            message = "```\n"
-            valid_languages = ["english", "french", "german", "japanese"]
-            for language in languages:
-                if language.lower() not in valid_languages:
-                    await ctx.reply(
-                        f"Invalid Language : `{language}`. Please Provide A Valid Language Used By Poketwo."
-                    )
-                    continue
-                if language.lower() in bot.languages:
-                    message += f"Language : {language} Is Already Added\n"
-                else:
-                    bot.languages.append(language.lower())
-                    message += f"Language : {language} Added\n"
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def languageremove(ctx, *languages: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            if not languages:
-                await ctx.reply(
-                    "`You Must Provide At Least One Language. Separate Multiple Languages With Spaces.`"
-                )
-                return
-            message = "```\n"
-            valid_languages = ["english", "french", "german", "japanese"]
-            for language in languages:
-                if language.lower() not in valid_languages:
-                    await ctx.reply(
-                        f"Invalid Language : `{language}`. Please Provide A Valid Language Used By Poketwo."
-                    )
-                    continue
-                if language.lower() in bot.languages:
-                    bot.languages = [lang for lang in bot.languages if lang != language]
-                    message += f"Language : {language} Removed\n"
-                else:
-                    message += f"Language : {language} Is Not Added\n"
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def blacklistadd(ctx, *pokemons: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            if not pokemons:
-                await ctx.reply(
-                    "`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`"
-                )
-                return
-            message = "```\n"
-            bot.blacklisted_pokemons = [
-                pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons
-            ]
-            for pokemon in pokemons:
-                if pokemon.lower() in bot.blacklisted_pokemons:
-                    message += f"Pokemon: {pokemon} Is Already Blacklisted\n"
-                else:
-                    bot.blacklisted_pokemons.append(pokemon.lower())
-                    message += f"Pokemon: {pokemon} Added To Blacklist\n"
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def blacklistremove(ctx, *pokemons: str) -> None:
-        if ctx.author.id == OWNER_ID:
-            if not pokemons:
-                await ctx.reply(
-                    "`You Must Provide At Least One Pokemon. Separate Multiple Pokemons With Spaces.`"
-                )
-                return
-            message = "```\n"
-            bot.blacklisted_pokemons = [
-                pokemon_name.lower() for pokemon_name in bot.blacklisted_pokemons
-            ]
-            for pokemon in pokemons:
-                if pokemon.lower() in bot.blacklisted_pokemons:
-                    bot.blacklisted_pokemons = [
-                        poke for poke in bot.blacklisted_pokemons if poke != pokemon
-                    ]
-                    message += f"Pokemon : {pokemon} Removed From Blacklist\n"
-                else:
-                    message += f"Pokemon : {pokemon} Is Not Blacklisted\n"
-            message += "```"
-            await ctx.send(message)
-
-    @bot.command()
-    async def solved(ctx) -> None:
-        if ctx.author.id == OWNER_ID:
-            bot.verified = True
-            await ctx.send("Thanks Dude! I Will Continue The Grind")
-            await ctx.send(f"<@{POKETWO_ID}> incense resume")
-            logger.info("Captcha Solved - Self Bot Booted")
-
-    @bot.command()
-    async def config(ctx) -> None:
-        if ctx.author.id == OWNER_ID:
-            message = f"```PREFIX: {bot.command_prefix}\nOWNER_ID: {OWNER_ID}\n\nWHITELISTED_CHANNELS = {bot.whitelisted_channels}\nBLACKLISTED_POKEMONS={bot.blacklisted_pokemons}\n\nLANGUAGES = {bot.languages}```"
-            await ctx.reply(message)
-
-    @bot.command()
-    async def say(ctx, *, message: str) -> None:
-        if ctx.message.author.id == OWNER_ID:
-            if "p2" in message.lower():
-                message = message.replace("p2", f"<@{POKETWO_ID}>")
-                await ctx.send(message)
-            else:
-                await ctx.send(message)
 
     @bot.event
     async def on_message(message) -> None:
@@ -436,7 +272,7 @@ async def run_autocatcher(token: str) -> None:
                     pokemon_image = message.embeds[0].image.url
                     predicted_pokemons = await pokefier.predict_pokemon_from_url(
                         pokemon_image
-                    )  # Predict the Pokémon
+                    )
                     predicted_pokemon = max(predicted_pokemons, key=lambda x: x[1])
                     name = predicted_pokemon[0]
                     score = predicted_pokemon[1]
