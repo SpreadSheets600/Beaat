@@ -1,0 +1,15 @@
+[Unit]
+Description=Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ubuntu/Pokefier
+ExecStart=/home/ubuntu/Pokefier/.venv/bin/python main.py
+Restart=always
+RestartSec=5s
+User=ubuntu
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
