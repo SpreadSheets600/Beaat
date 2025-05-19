@@ -93,7 +93,7 @@ def load_config():
 
 def check_config(key: str):
     try:
-        with open("source\config.json", "r") as file:
+        with open("source/config.json", "r") as file:
             config = json.load(file)
 
         if key in config:
@@ -109,12 +109,12 @@ def check_config(key: str):
 
 def update_config(key: str, value: str):
     try:
-        with open("source\config.json", "r") as file:
+        with open("source/config.json", "r") as file:
             config = json.load(file)
 
         config[key] = value
 
-        with open("source\config.json", "w") as file:
+        with open("source/config.json", "w") as file:
             json.dump(config, file, indent=4)
 
         logger.info(f"Updated config: {key} = {value}")
@@ -193,6 +193,9 @@ async def run_autocatcher(token: str) -> None:
 
         await bot.load_extension("commands.language")
         logger.info("+ Loaded Language Commands")
+
+        await bot.load_extension("commands.token")
+        logger.info("+ Loaded Token Commands")
 
         bot.verified = True
         bot.pokemons_caught = 0
