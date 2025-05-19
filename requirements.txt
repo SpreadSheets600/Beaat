@@ -1,4 +1,4 @@
-git+https://github.com/dolfies/discord.py-self@master#egg=discord.py-self[voice,speed]
+git+https://github.com/Xellos69/discord.py-self@master#egg=discord.py-self[voice,speed]
 discord_webhook
 logging
 numpy
