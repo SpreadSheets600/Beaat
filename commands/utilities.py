@@ -1,3 +1,4 @@
+import sys
 import discord
 from discord.ext import commands
 from main import OWNER_ID, POKETWO_ID, check_config, update_config, load_config, logger
@@ -71,7 +72,6 @@ class UtilitiesCommandCog(commands.Cog):
     @commands.command()
     async def config(self, ctx) -> None:
         if ctx.author.id in OWNER_ID:
-
             loaded_config = load_config()
             self.bot.whitelisted_channels = loaded_config["WHITELISTED_CHANNELS"]
             self.bot.blacklisted_pokemons = loaded_config["BLACKLISTED_POKEMONS"]
@@ -88,6 +88,15 @@ class UtilitiesCommandCog(commands.Cog):
                 await ctx.send(message)
             else:
                 await ctx.send(message)
+
+    @commands.command()
+    async def restart(self, ctx) -> None:
+        if ctx.author.id in OWNER_ID:
+            await ctx.send("Ahhh Let Me Freshen up!")
+            await self.bot.close()
+            sys.exit(0)
+
+            logger.info("Self Bot Restarted")
 
 
 async def setup(bot):
